@@ -8,6 +8,7 @@
         ShowInTaskbar="False"
         SizeToContent="WidthAndHeight"
         Left="0" Top="0"
+        Icon="/Assets/icon.ico"
         Title="Screen Writer Toolbar"
         MouseEnter="Toolbar_MouseEnter"
         MouseLeave="Toolbar_MouseLeave">

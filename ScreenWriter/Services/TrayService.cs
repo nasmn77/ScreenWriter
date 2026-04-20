@@ -55,6 +55,12 @@ public sealed class TrayService : IDisposable
 
     private static Icon CreateIcon()
     {
+        var exeDir  = AppContext.BaseDirectory;
+        var icoPath = System.IO.Path.Combine(exeDir, "Assets", "icon.ico");
+        if (System.IO.File.Exists(icoPath))
+            return new Icon(icoPath, 32, 32);
+
+        // Fallback: programmatic icon
         using var bmp = new Bitmap(32, 32);
         using var g   = Graphics.FromImage(bmp);
         g.Clear(Color.Transparent);

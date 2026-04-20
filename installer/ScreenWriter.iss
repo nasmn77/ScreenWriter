@@ -23,6 +23,7 @@ SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=lowest
 ArchitecturesInstallIn64BitMode=x64compatible
+SetupIconFile=C:\MyProjects\Screen Writer\ScreenWriter\Assets\icon.ico
 
 [Languages]
 Name: "arabic"; MessagesFile: "compiler:Default.isl"
@@ -38,11 +39,12 @@ Source: "{#PublishDir}\PenImc_cor3.dll";         DestDir: "{app}"; Flags: ignore
 Source: "{#PublishDir}\PresentationNative_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#PublishDir}\vcruntime140_cor3.dll";   DestDir: "{app}"; Flags: ignoreversion
 Source: "{#PublishDir}\wpfgfx_cor3.dll";         DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\Assets\icon.ico";         DestDir: "{app}\Assets"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\{#MyAppName}";          Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{#MyAppName}";          Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\Assets\icon.ico"
 Name: "{group}\إلغاء التثبيت";         Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}";    Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autodesktop}\{#MyAppName}";    Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\Assets\icon.ico"; Tasks: desktopicon
 
 [Registry]
 ; تشغيل عند بدء Windows

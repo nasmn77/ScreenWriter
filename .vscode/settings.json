@@ -1,6 +1,7 @@
 {
     "chat.tools.terminal.autoApprove": {
         "dotnet run": true,
-        "dotnet publish": true
+        "dotnet publish": true,
+        "Get-Command": true
     }
 }

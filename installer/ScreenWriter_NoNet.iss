@@ -23,6 +23,7 @@ SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=lowest
 ArchitecturesInstallIn64BitMode=x64compatible
+SetupIconFile=..\ScreenWriter\Assets\icon.ico
 
 [Languages]
 Name: "arabic"; MessagesFile: "compiler:Default.isl"
@@ -36,11 +37,12 @@ Source: "{#PublishDir}\{#MyAppExeName}";      DestDir: "{app}"; Flags: ignorever
 Source: "{#PublishDir}\ScreenWriter.dll";     DestDir: "{app}"; Flags: ignoreversion
 Source: "{#PublishDir}\ScreenWriter.deps.json";       DestDir: "{app}"; Flags: ignoreversion
 Source: "{#PublishDir}\ScreenWriter.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\ScreenWriter\Assets\icon.ico";    DestDir: "{app}\Assets"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\{#MyAppName}";          Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{#MyAppName}";          Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\Assets\icon.ico"
 Name: "{group}\إلغاء التثبيت";         Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}";    Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autodesktop}\{#MyAppName}";    Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\Assets\icon.ico"; Tasks: desktopicon
 
 [Registry]
 ; تشغيل عند بدء Windows
