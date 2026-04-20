@@ -1,0 +1,14 @@
+<Window x:Class="ScreenWriter.Windows.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        Title="ScreenWriter Overlay">
+    <InkCanvas x:Name="Canvas"
+               Background="#01000000"
+               EditingMode="None"
+               UseCustomCursor="True"/>
+</Window>
