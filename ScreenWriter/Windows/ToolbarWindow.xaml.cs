@@ -133,12 +133,14 @@ public partial class ToolbarWindow : Window
     private void BtnLine_Click   (object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Line,      BtnLine);
     private void BtnRect_Click   (object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Rectangle, BtnRect);
     private void BtnEllipse_Click(object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Ellipse,   BtnEllipse);
+    private void BtnText_Click   (object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Text,      BtnText);
 
     private void BtnEraser_Click(object sender, RoutedEventArgs e)
     {
         _eraserActive = !_eraserActive;
         if (_eraserActive)
         {
+            if (_activeToolBtn is not null) _activeToolBtn.Foreground = InactiveBrush;
             HighlightTool(BtnEraser, Brushes.Orange);
             _activeToolBtn = BtnEraser;
             ToolChanged?.Invoke(DrawingTool.Eraser);
@@ -169,8 +171,11 @@ public partial class ToolbarWindow : Window
     private void SizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         => PenSizeChanged?.Invoke(e.NewValue);
 
-    // ── Undo / Redo / Clear ───────────────────────────────────────────────────
+    public event Action? ExitRequested;
+
+    // ── Undo / Redo / Clear ────────────────────────────────────────────────
     private void BtnUndo_Click (object sender, RoutedEventArgs e) => UndoRequested?.Invoke();
     private void BtnRedo_Click (object sender, RoutedEventArgs e) => RedoRequested?.Invoke();
     private void BtnClear_Click(object sender, RoutedEventArgs e) => ClearRequested?.Invoke();
+    private void BtnClose_Click(object sender, RoutedEventArgs e) => ExitRequested?.Invoke();
 }

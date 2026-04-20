@@ -31,6 +31,7 @@ public partial class App : System.Windows.Application
         _toolbar.UndoRequested += () => _overlay.Undo();
         _toolbar.RedoRequested += () => _overlay.Redo();
         _toolbar.ClearRequested += () => _overlay.ConfirmedClearAll();
+        _toolbar.ExitRequested  += () => Shutdown();
 
         _tray = new TrayService(_overlay, _toolbar);
         _hotkeys = new HotkeyService(_overlay, _toolbar);

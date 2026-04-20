@@ -12,6 +12,7 @@ using Point          = System.Windows.Point;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Rectangle      = System.Windows.Shapes.Rectangle;
 using Brushes        = System.Windows.Media.Brushes;
+using TextBox        = System.Windows.Controls.TextBox;
 
 using ScreenWriter.Models;
 
@@ -53,6 +54,12 @@ public partial class OverlayWindow : Window
 
     private Point  _shapeStart;
     private Shape? _previewShape;
+
+    // ── Text tool state ───────────────────────────────────────────────────────
+    private Window?           _activeInputWindow;
+    private Point             _activeTextPos;
+    private double            _activeTextFontSize;
+    private SolidColorBrush?  _activeTextBrush;
 
     private bool _drawingMode;
     public bool IsDrawingMode => _drawingMode;
@@ -111,15 +118,22 @@ public partial class OverlayWindow : Window
     public void ToggleDrawingMode()
     {
         _drawingMode = !_drawingMode;
-        ApplyClickThrough(!_drawingMode);
         if (!_drawingMode)
+        {
+            CommitTextBox();
+            ApplyClickThrough(true);
             Canvas.EditingMode = InkCanvasEditingMode.None;
+        }
         else
+        {
+            ApplyClickThrough(false);
             SetTool(_currentTool);   // restore correct editing mode
+        }
     }
 
     public void SetTool(DrawingTool tool)
     {
+        CommitTextBox(); // commit any pending text before switching tools
         _currentTool = tool;
         Canvas.EditingMode = tool switch
         {
@@ -176,7 +190,21 @@ public partial class OverlayWindow : Window
     // ── Shape mouse events ────────────────────────────────────────────────────
     private void OnShapeMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (_currentTool is DrawingTool.Pen or DrawingTool.Eraser) return;
+        if (_currentTool is DrawingTool.Pen or DrawingTool.Eraser)
+        {
+            // Eraser tool: also hit-test UIElement children (shapes & text)
+            if (_currentTool == DrawingTool.Eraser)
+                EraseChildAt(e.GetPosition(Canvas));
+            return;
+        }
+
+        if (_currentTool == DrawingTool.Text)
+        {
+            PlaceTextBox(e.GetPosition(Canvas));
+            e.Handled = true;
+            return;
+        }
+
         _shapeStart   = e.GetPosition(Canvas);
         _previewShape = BuildShape(_shapeStart, _shapeStart);
         Canvas.Children.Add(_previewShape);
@@ -186,9 +214,42 @@ public partial class OverlayWindow : Window
 
     private void OnShapeMouseMove(object sender, MouseEventArgs e)
     {
+        // Erase while dragging
+        if (_currentTool == DrawingTool.Eraser && e.LeftButton == MouseButtonState.Pressed)
+            EraseChildAt(e.GetPosition(Canvas));
+
         if (_previewShape is null) return;
         UpdateShape(_previewShape, _shapeStart, e.GetPosition(Canvas));
         e.Handled = true;
+    }
+
+    private void EraseChildAt(Point pos)
+    {
+        const double HitRadius = 20;
+        UIElement? hit = null;
+        foreach (UIElement child in Canvas.Children)
+        {
+            var left = InkCanvas.GetLeft(child);
+            var top  = InkCanvas.GetTop(child);
+            if (double.IsNaN(left)) left = 0;
+            if (double.IsNaN(top))  top  = 0;
+
+            child.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+            var w = child.DesiredSize.Width;
+            var h = child.DesiredSize.Height;
+
+            var rect = new Rect(left - HitRadius, top - HitRadius,
+                                w + HitRadius * 2, h + HitRadius * 2);
+            if (rect.Contains(pos)) { hit = child; break; }
+        }
+        if (hit is null) return;
+
+        Canvas.Children.Remove(hit);
+        var removed = hit;
+        _redoStack.Clear();
+        _undoStack.Push(new(
+            Undo: () => Canvas.Children.Add(removed),
+            Redo: () => Canvas.Children.Remove(removed)));
     }
 
     private void OnShapeMouseUp(object sender, MouseButtonEventArgs e)
@@ -283,8 +344,104 @@ public partial class OverlayWindow : Window
         if (_redoStack.TryPop(out var e)) { e.Redo(); _undoStack.Push(e); }
     }
 
+    // ── Text tool ─────────────────────────────────────────────────────────────
+    // Uses a separate floating input window so the overlay never loses
+    // WS_EX_NOACTIVATE and never floats above the toolbar.
+    private void PlaceTextBox(Point canvasPos)
+    {
+        CommitTextBox(); // save any existing text before opening a new one
+
+        _activeTextPos      = canvasPos;
+        _activeTextFontSize = Math.Max(16, _currentPenSize * 4);
+        _activeTextBrush    = new SolidColorBrush(_currentColor);
+
+        var tb = new TextBox
+        {
+            Background      = new SolidColorBrush(Color.FromArgb(30, 0, 0, 0)),
+            Foreground      = _activeTextBrush,
+            CaretBrush      = _activeTextBrush,
+            BorderBrush     = new SolidColorBrush(Color.FromArgb(120,
+                _currentColor.R, _currentColor.G, _currentColor.B)),
+            BorderThickness = new Thickness(1),
+            FontFamily      = new System.Windows.Media.FontFamily("Arial"),
+            FontSize        = _activeTextFontSize,
+            MinWidth        = 120,
+            AcceptsReturn   = true,
+            TextWrapping    = TextWrapping.Wrap,
+            MaxWidth        = 600,
+        };
+
+        var screenPt = Canvas.PointToScreen(canvasPos);
+        var win = new Window
+        {
+            WindowStyle        = WindowStyle.None,
+            AllowsTransparency = true,
+            Background         = Brushes.Transparent,
+            Topmost            = true,
+            ShowInTaskbar      = false,
+            SizeToContent      = SizeToContent.WidthAndHeight,
+            Left               = screenPt.X,
+            Top                = screenPt.Y,
+            Title              = "",
+            Content            = tb,
+        };
+
+        _activeInputWindow = win;
+
+        tb.LostFocus += (_, _) => Dispatcher.BeginInvoke(CommitTextBox);
+        tb.KeyDown   += (_, e) =>
+        {
+            if (e.Key == Key.Escape) { CancelTextBox(); e.Handled = true; }
+        };
+
+        win.Show();
+        tb.Focus();
+    }
+
+    private void CommitTextBox()
+    {
+        if (_activeInputWindow is null) return;
+        var win = _activeInputWindow;
+        _activeInputWindow = null;
+
+        var tb   = (TextBox)win.Content;
+        var text = tb.Text.Trim();
+        var pos  = _activeTextPos;
+        win.Close();
+
+        if (string.IsNullOrEmpty(text)) return;
+
+        var block = new TextBlock
+        {
+            Text         = text,
+            Foreground   = _activeTextBrush,
+            FontFamily   = new System.Windows.Media.FontFamily("Arial"),
+            FontSize     = _activeTextFontSize,
+            TextWrapping = TextWrapping.Wrap,
+            MaxWidth     = 600,
+        };
+        InkCanvas.SetLeft(block, pos.X);
+        InkCanvas.SetTop (block, pos.Y);
+        Canvas.Children.Add(block);
+
+        var final = block;
+        _redoStack.Clear();
+        _undoStack.Push(new(
+            Undo: () => Canvas.Children.Remove(final),
+            Redo: () => Canvas.Children.Add(final)));
+    }
+
+    private void CancelTextBox()
+    {
+        if (_activeInputWindow is null) return;
+        var win = _activeInputWindow;
+        _activeInputWindow = null;
+        win.Close();
+    }
+
     public void ClearAll()
     {
+        CancelTextBox();
         if (Canvas.Strokes.Count == 0 && Canvas.Children.Count == 0) return;
 
         var strokes = new StrokeCollection(Canvas.Strokes);
@@ -307,6 +464,7 @@ public partial class OverlayWindow : Window
 
     public void ConfirmedClearAll()
     {
+        CommitTextBox();
         if (Canvas.Strokes.Count == 0 && Canvas.Children.Count == 0) return;
 
         bool wasDrawing = _drawingMode;
