@@ -3,6 +3,11 @@ bin/
 obj/
 *.user
 
+# Publish output
+publish/
+publish_small/
+installer_output/
+
 # Visual Studio
 .vs/
 *.suo
