@@ -623,6 +623,94 @@
     letter-spacing: 1px;
   }
 
+  /* Developer section */
+  .dev-section {
+    padding: 100px 30px;
+    position: relative; z-index: 5;
+  }
+  .dev-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--glass);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    padding: 52px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+  }
+  .dev-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% -20%, rgba(167,139,250,0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .dev-card .dev-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: conic-gradient(from 120deg, var(--violet), var(--cyan), var(--rose), var(--violet));
+    display: grid; place-items: center;
+    font-size: 32px;
+    margin: 0 auto 22px;
+    box-shadow: 0 0 40px rgba(167,139,250,0.4);
+  }
+  .dev-card .dev-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin-bottom: 10px;
+    opacity: 0.8;
+  }
+  .dev-card .dev-name {
+    font-size: 30px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 40%, var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .dev-card .dev-tagline {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+  .dev-card .dev-divider {
+    width: 40px; height: 2px;
+    background: linear-gradient(90deg, var(--violet), var(--cyan));
+    margin: 0 auto 28px;
+    border-radius: 2px;
+  }
+  .dev-card .email-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(167,139,250,0.1);
+    border: 1px solid rgba(167,139,250,0.35);
+    border-radius: 999px;
+    padding: 12px 26px;
+    color: var(--violet);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all .3s ease;
+    direction: ltr;
+  }
+  .dev-card .email-btn:hover {
+    background: rgba(167,139,250,0.2);
+    border-color: var(--violet);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(167,139,250,0.25);
+  }
+  .dev-card .email-btn svg {
+    flex-shrink: 0;
+  }
+
   /* Reveal */
   .reveal { opacity: 0; transform: translateY(30px); transition: all .9s cubic-bezier(.2,.7,.2,1); }
   .reveal.in { opacity: 1; transform: none; }
@@ -662,7 +750,7 @@
   <div class="wrap">
     <div class="badge reveal">
       <span class="dot">✦</span>
-      <span>NEW · v1.0 · WINDOWS 10+</span>
+      <span>ويندوز ≥ 10</span>
     </div>
     <h1 class="reveal">
       شاشتك،<br>
@@ -851,9 +939,31 @@
   </div>
 </section>
 
+<section class="dev-section">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">المطوّر · DEVELOPER</span>
+    </div>
+    <div class="dev-card reveal">
+      <div class="dev-avatar">👨‍💻</div>
+      <div class="dev-label">Developer</div>
+      <div class="dev-name">ناصر الماضي</div>
+      <div class="dev-tagline">مطوّر تطبيقات ومواقع ويب</div>
+      <div class="dev-divider"></div>
+      <a class="email-btn" href="mailto:nasmn77@gmail.com">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <polyline points="2,4 12,13 22,4"/>
+        </svg>
+        nasmn77@gmail.com
+      </a>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="brand">Screen Writer</div>
-  <div class="meta">WPF · .NET 10 · MIT LICENSE · © 2026</div>
+  <div class="meta">© 2026</div>
 </footer>
 
 <script>
