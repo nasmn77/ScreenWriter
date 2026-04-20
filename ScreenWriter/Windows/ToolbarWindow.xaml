@@ -115,6 +115,10 @@
 
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 
+            <!-- عن البرنامج -->
+            <Button Content="ⓘ" Style="{StaticResource ToolBtn}" Click="BtnAbout_Click"
+                    Foreground="#06D6A0" ToolTip="عن البرنامج" Padding="6,0"/>
+
             <!-- إغلاق -->
             <Button Content="✕" Style="{StaticResource ToolBtn}" Click="BtnClose_Click"
                     Foreground="#FF6B6B" ToolTip="إغلاق التطبيق" Padding="6,0"/>

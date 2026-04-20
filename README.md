@@ -4,6 +4,12 @@
 
 > Built with C# · WPF · .NET 10 · Windows
 
+## 📥 التحميل
+
+حمّل التطبيق من صفحة التحميل الرسمية:
+
+### 👉 https://docs.naseralmadi.cloud/apps/index.html
+
 ---
 
 ## المميزات

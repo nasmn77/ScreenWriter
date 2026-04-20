@@ -172,10 +172,12 @@ public partial class ToolbarWindow : Window
         => PenSizeChanged?.Invoke(e.NewValue);
 
     public event Action? ExitRequested;
+    public event Action? AboutRequested;
 
     // ── Undo / Redo / Clear ────────────────────────────────────────────────
     private void BtnUndo_Click (object sender, RoutedEventArgs e) => UndoRequested?.Invoke();
     private void BtnRedo_Click (object sender, RoutedEventArgs e) => RedoRequested?.Invoke();
     private void BtnClear_Click(object sender, RoutedEventArgs e) => ClearRequested?.Invoke();
     private void BtnClose_Click(object sender, RoutedEventArgs e) => ExitRequested?.Invoke();
+    private void BtnAbout_Click(object sender, RoutedEventArgs e) => AboutRequested?.Invoke();
 }

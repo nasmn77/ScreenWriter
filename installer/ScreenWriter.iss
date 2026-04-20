@@ -17,13 +17,13 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=..\installer_output
-OutputBaseFilename=Setup_ScreenWriter_v{#MyAppVersion}
+OutputBaseFilename=Setup_ScreenWriter
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=lowest
 ArchitecturesInstallIn64BitMode=x64compatible
-SetupIconFile=C:\MyProjects\Screen Writer\ScreenWriter\Assets\icon.ico
+SetupIconFile=..\ScreenWriter\Assets\icon.ico
 
 [Languages]
 Name: "arabic"; MessagesFile: "compiler:Default.isl"
@@ -33,13 +33,7 @@ Name: "desktopicon"; Description: "إنشاء اختصار على سطح الم�
 Name: "startupicon"; Description: "تشغيل عند بدء Windows"; GroupDescription: "اختصارات إضافية:"; Flags: unchecked
 
 [Files]
-Source: "{#PublishDir}\{#MyAppExeName}";         DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\D3DCompiler_47_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\PenImc_cor3.dll";         DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\PresentationNative_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\vcruntime140_cor3.dll";   DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\wpfgfx_cor3.dll";         DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\Assets\icon.ico";         DestDir: "{app}\Assets"; Flags: ignoreversion
+Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}";          Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\Assets\icon.ico"
