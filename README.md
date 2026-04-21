@@ -1,5 +1,7 @@
 # ScreenWriter
 
+> 🇬🇧 **English description is available below** — [Jump to English](#english)
+
 تطبيق Windows للرسم والتوضيح فوق الشاشة بشكل كامل، مصمم للشرح أثناء الاجتماعات الافتراضية ومشاركة الشاشة. يدعم اللغتين العربية والإنجليزية مع تبديل فوري بدون إعادة تشغيل.
 
 > Built with C# · WPF · .NET 10 · Windows
@@ -8,7 +10,7 @@
 
 حمّل التطبيق من صفحة التحميل الرسمية:
 
-### 👉 https://docs.naseralmadi.cloud/apps/ar/
+### 👉 <a href="https://docs.naseralmadi.cloud/apps/ar/" target="_blank">https://docs.naseralmadi.cloud/apps/ar/</a>
 
 ---
 
@@ -178,6 +180,8 @@ MIT License — حر الاستخدام والتعديل والتوزيع.
 
 ---
 
+<a name="english"></a>
+
 # ScreenWriter
 
 A Windows app for drawing and annotating directly on screen, designed for explaining ideas during virtual meetings and screen sharing. Supports Arabic and English with instant switching — no restart needed.
@@ -188,7 +192,7 @@ A Windows app for drawing and annotating directly on screen, designed for explai
 
 Download the app from the official page:
 
-### 👉 https://docs.naseralmadi.cloud/apps/en/
+### 👉 <a href="https://docs.naseralmadi.cloud/apps/en/" target="_blank">https://docs.naseralmadi.cloud/apps/en/</a>
 
 ---
 
