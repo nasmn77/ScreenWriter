@@ -10,7 +10,7 @@
 
 حمّل التطبيق من صفحة التحميل الرسمية:
 
-### 👉 <a href="https://docs.naseralmadi.cloud/apps/ar/" target="_blank">https://docs.naseralmadi.cloud/apps/ar/</a>
+### 👉 https://docs.naseralmadi.cloud/apps/ar/
 
 ---
 
@@ -82,7 +82,7 @@ dotnet run
 ## شريط الأدوات
 
 ```
-[ رسم/إيقاف ] | [ ● ● ● ● ● ● ● ● ] | [ ━ حجم ] | [ 🖊 ╱ ▭ ⬭ T ⌫ ] | [ ↩ ↪ 🗑 ] | [ ✕ ]
+[ رسم/إيقاف ] | [ ● ● ● ● ● ● ● ● ] | [ ━ حجم ] | [ 🖊 ╱ ▭ ⬭ T ⌫ ] | [ ↩ ↪ 🗑 ] | [ EN/ع ] | [ ✕ ]
 ```
 
 | العنصر | الوصف |
@@ -99,6 +99,7 @@ dotnet run
 | **↩ تراجع** | تراجع عن آخر خطوة |
 | **↪ إعادة** | إعادة الخطوة الملغاة |
 | **🗑 مسح الكل** | مسح جميع الرسومات مع رسالة تأكيد |
+| **EN/ع اللغة** | تبديل فوري بين العربية والإنجليزية |
 | **✕ إغلاق** | إغلاق التطبيق نهائياً |
 
 ---
@@ -192,7 +193,7 @@ A Windows app for drawing and annotating directly on screen, designed for explai
 
 Download the app from the official page:
 
-### 👉 <a href="https://docs.naseralmadi.cloud/apps/en/" target="_blank">https://docs.naseralmadi.cloud/apps/en/</a>
+### 👉 https://docs.naseralmadi.cloud/apps/en/
 
 ---
 
