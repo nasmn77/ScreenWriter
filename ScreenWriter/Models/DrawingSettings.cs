@@ -3,7 +3,7 @@ using Color = System.Windows.Media.Color;
 
 namespace ScreenWriter.Models;
 
-public enum DrawingTool { Pen, Eraser, Line, Rectangle, Ellipse, Text }
+public enum DrawingTool { Pen, Arrow, Line, Rectangle, Ellipse, Text, Eraser }
 
 public static class DrawingSettings
 {

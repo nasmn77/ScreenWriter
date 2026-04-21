@@ -25,6 +25,7 @@
     <sys:String x:Key="Str_ToolEllipse">Circle / Ellipse</sys:String>
     <sys:String x:Key="Str_ToolText">Text</sys:String>
     <sys:String x:Key="Str_ToolEraser">Eraser</sys:String>
+    <sys:String x:Key="Str_ToolArrow">Arrow</sys:String>
 
     <!-- Actions -->
     <sys:String x:Key="Str_Undo">Undo</sys:String>
@@ -32,6 +33,7 @@
     <sys:String x:Key="Str_ClearAll">Clear All</sys:String>
     <sys:String x:Key="Str_About">About</sys:String>
     <sys:String x:Key="Str_Close">Close</sys:String>
+    <sys:String x:Key="Str_TogglePosition">Move Toolbar</sys:String>
     <sys:String x:Key="Str_LangToggle">ع</sys:String>
 
     <!-- Dialogs -->

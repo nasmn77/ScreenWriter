@@ -19,10 +19,10 @@
 - **طبقة شفافة فوق كل النوافذ** — يرسم فوق أي تطبيق دون إيقافه
 - **مرئي في مشاركة الشاشة** — يظهر في Zoom وTeams وGoogle Meet وOBS
 - **دعم اللغتين** — عربي وإنجليزي مع تبديل فوري من شريط الأدوات
-- **أدوات رسم متعددة** — رسم حر، خط مستقيم، مستطيل، دائرة/بيضاوي، كتابة نص
+- **أدوات رسم متعددة** — رسم حر، سهم، خط مستقيم، مستطيل، دائرة/بيضاوي، كتابة نص
 - **8 ألوان** مع تحكم كامل في حجم القلم
 - **ممحاة** وتراجع/إعادة كاملين (يشملان مسح الكل)
-- **شريط أدوات عائم** ينزلق تلقائياً من أعلى يسار الشاشة
+- **شريط أدوات عائم** ينزلق تلقائياً — يمكن تبديل موضعه بين يسار ويمين الشاشة
 - **System Tray** للتشغيل في الخلفية
 - **اختصارات لوحة المفاتيح** العالمية (تعمل من أي تطبيق)
 - لا يسرق الـ Focus من التطبيقات الأخرى
@@ -82,7 +82,7 @@ dotnet run
 ## شريط الأدوات
 
 ```
-[ رسم/إيقاف ] | [ ● ● ● ● ● ● ● ● ] | [ ━ حجم ] | [ 🖊 ╱ ▭ ⬭ T ⌫ ] | [ ↩ ↪ 🗑 ] | [ EN/ع ] | [ ✕ ]
+[ رسم/إيقاف ] | [ ● ● ● ● ● ● ● ● ] | [ ━ حجم ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⇌ ] | [ EN/ع ] | [ ✕ ]
 ```
 
 | العنصر | الوصف |
@@ -91,6 +91,7 @@ dotnet run
 | **● الألوان** | أحمر، برتقالي، أصفر، أخضر، أزرق، بنفسجي، أبيض، أسود |
 | **━ الحجم** | شريط تمرير لضبط سماكة القلم (2–30) |
 | **🖊 رسم حر** | خطوط حرة سلسة |
+| **⇒ سهم** | سهم مع رأس سهم تلقائي |
 | **╱ خط** | خط مستقيم بين نقطتين |
 | **▭ مستطيل** | مستطيل بالسحب |
 | **⬭ دائرة** | دائرة أو شكل بيضاوي بالسحب |
@@ -99,6 +100,7 @@ dotnet run
 | **↩ تراجع** | تراجع عن آخر خطوة |
 | **↪ إعادة** | إعادة الخطوة الملغاة |
 | **🗑 مسح الكل** | مسح جميع الرسومات مع رسالة تأكيد |
+| **⇌ موضع الشريط** | تبديل موضع شريط الأدوات بين يسار ويمين الشاشة |
 | **EN/ع اللغة** | تبديل فوري بين العربية والإنجليزية |
 | **✕ إغلاق** | إغلاق التطبيق نهائياً |
 
@@ -110,6 +112,8 @@ dotnet run
 |---|---|
 | `Ctrl + Alt + D` | تفعيل / إيقاف وضع الرسم |
 | `Ctrl + Alt + C` | مسح جميع الرسومات (مع تأكيد) |
+| `Ctrl + Z` | تراجع (أثناء وضع الرسم) |
+| `Ctrl + Y` | إعادة (أثناء وضع الرسم) |
 
 ---
 
@@ -155,7 +159,8 @@ ScreenWriter/
 └── Services/
     ├── HotkeyService.cs            # اختصارات لوحة المفاتيح العالمية (Win32)
     ├── TrayService.cs              # أيقونة System Tray
-    └── LocalizationService.cs      # إدارة اللغة والتبديل الفوري
+    ├── LocalizationService.cs      # إدارة اللغة والتبديل الفوري
+    └── SettingsService.cs          # حفظ واستعادة إعدادات المستخدم
 ```
 
 ---
@@ -202,10 +207,10 @@ Download the app from the official page:
 - **Transparent overlay** — draws over any app without disabling it
 - **Visible in screen share** — works with Zoom, Teams, Google Meet, and OBS
 - **Bilingual support** — Arabic & English with instant toggle from the toolbar
-- **Multiple drawing tools** — free draw, straight line, rectangle, circle/ellipse, text
+- **Multiple drawing tools** — free draw, arrow, straight line, rectangle, circle/ellipse, text
 - **8 colors** with full pen size control
 - **Eraser** and full undo/redo (including clear all)
-- **Floating toolbar** — auto-slides in from the top-left corner of the screen
+- **Floating toolbar** — auto-slides in; position can be toggled between left and right
 - **System Tray** for background operation
 - **Global hotkeys** — work from any app
 - Does not steal focus from other applications
@@ -260,7 +265,7 @@ Select a tool from the toolbar and draw directly on the screen.
 ## Toolbar
 
 ```
-[ Draw/Stop ] | [ ● ● ● ● ● ● ● ● ] | [ ━ Size ] | [ 🖊 ╱ ▭ ⬭ T ⌫ ] | [ ↩ ↪ 🗑 ] | [ EN/ع ] | [ ✕ ]
+[ Draw/Stop ] | [ ● ● ● ● ● ● ● ● ] | [ ━ Size ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⇌ ] | [ EN/ع ] | [ ✕ ]
 ```
 
 | Element | Description |
@@ -269,6 +274,7 @@ Select a tool from the toolbar and draw directly on the screen.
 | **● Colors** | Red, Orange, Yellow, Green, Blue, Purple, White, Black |
 | **━ Size** | Slider to adjust pen thickness (2–30) |
 | **🖊 Free Draw** | Smooth freehand lines |
+| **⇒ Arrow** | Arrow with automatic arrowhead |
 | **╱ Line** | Straight line between two points |
 | **▭ Rectangle** | Rectangle by dragging |
 | **⬭ Circle** | Circle or ellipse by dragging |
@@ -277,6 +283,7 @@ Select a tool from the toolbar and draw directly on the screen.
 | **↩ Undo** | Undo last action |
 | **↪ Redo** | Redo undone action |
 | **🗑 Clear All** | Clear all drawings with confirmation |
+| **⇌ Move Toolbar** | Toggle toolbar position between left and right |
 | **EN/ع** | Toggle language between English and Arabic |
 | **✕ Close** | Close the application |
 
@@ -288,6 +295,8 @@ Select a tool from the toolbar and draw directly on the screen.
 |---|---|
 | `Ctrl + Alt + D` | Toggle drawing mode on / off |
 | `Ctrl + Alt + C` | Clear all drawings (with confirmation) |
+| `Ctrl + Z` | Undo (while drawing mode is active) |
+| `Ctrl + Y` | Redo (while drawing mode is active) |
 
 ---
 
@@ -333,7 +342,8 @@ ScreenWriter/
 └── Services/
     ├── HotkeyService.cs            # Global hotkeys (Win32)
     ├── TrayService.cs              # System Tray icon
-    └── LocalizationService.cs      # Language management and instant switching
+    ├── LocalizationService.cs      # Language management and instant switching
+    └── SettingsService.cs          # Save and restore user settings
 ```
 
 ---

@@ -63,7 +63,7 @@
         </Style>
     </Window.Resources>
 
-    <Border Background="#E0111827" CornerRadius="0,0,12,0" Padding="10,7">
+    <Border x:Name="ToolbarBorder" Background="#E0111827" CornerRadius="0,0,12,0" Padding="10,7">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 
             <!-- تفعيل/إيقاف -->
@@ -102,6 +102,7 @@
 
             <!-- أدوات الرسم -->
             <Button x:Name="BtnPen"     Content="🖊"  Style="{StaticResource ToolBtn}" Click="BtnPen_Click"     ToolTip="{DynamicResource Str_ToolPen}"/>
+            <Button x:Name="BtnArrow"   Content="⇒"   Style="{StaticResource ToolBtn}" Click="BtnArrow_Click"   ToolTip="{DynamicResource Str_ToolArrow}"/>
             <Button x:Name="BtnLine"    Content="╱"   Style="{StaticResource ToolBtn}" Click="BtnLine_Click"    ToolTip="{DynamicResource Str_ToolLine}"/>
             <Button x:Name="BtnRect"    Content="▭"   Style="{StaticResource ToolBtn}" Click="BtnRect_Click"    ToolTip="{DynamicResource Str_ToolRect}"/>
             <Button x:Name="BtnEllipse" Content="⬭"   Style="{StaticResource ToolBtn}" Click="BtnEllipse_Click" ToolTip="{DynamicResource Str_ToolEllipse}"/>
@@ -120,6 +121,11 @@
             <!-- عن البرنامج -->
             <Button Content="ⓘ" Style="{StaticResource ToolBtn}" Click="BtnAbout_Click"
                     Foreground="#06D6A0" ToolTip="{DynamicResource Str_About}" Padding="6,0"/>
+
+            <!-- تبديل موضع الشريط -->
+            <Button x:Name="BtnPosition" Content="⇌" Style="{StaticResource ToolBtn}"
+                    Click="BtnPosition_Click" Foreground="#888888"
+                    ToolTip="{DynamicResource Str_TogglePosition}" Padding="4,0"/>
 
             <!-- تبديل اللغة -->
             <Button x:Name="BtnLang"

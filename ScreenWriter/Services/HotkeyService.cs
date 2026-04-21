@@ -18,6 +18,8 @@ public sealed class HotkeyService : IDisposable
     private const uint MOD_ALT      = 0x0001;
     private const int  ID_TOGGLE    = 1;
     private const int  ID_CLEAR     = 2;
+    private const int  ID_UNDO      = 3;
+    private const int  ID_REDO      = 4;
 
     private readonly OverlayWindow _overlay;
     private readonly ToolbarWindow _toolbar;
@@ -41,6 +43,10 @@ public sealed class HotkeyService : IDisposable
             (uint)KeyInterop.VirtualKeyFromKey(Key.D));
         RegisterHotKey(_hwnd, ID_CLEAR, MOD_CONTROL | MOD_ALT,
             (uint)KeyInterop.VirtualKeyFromKey(Key.C));
+        RegisterHotKey(_hwnd, ID_UNDO, MOD_CONTROL,
+            (uint)KeyInterop.VirtualKeyFromKey(Key.Z));
+        RegisterHotKey(_hwnd, ID_REDO, MOD_CONTROL,
+            (uint)KeyInterop.VirtualKeyFromKey(Key.Y));
     }
 
     private nint Hook(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
@@ -59,6 +65,20 @@ public sealed class HotkeyService : IDisposable
                 _overlay.ConfirmedClearAll();
                 handled = true;
                 break;
+            case ID_UNDO:
+                if (_overlay.IsDrawingMode)
+                {
+                    _overlay.Undo();
+                    handled = true;
+                }
+                break;
+            case ID_REDO:
+                if (_overlay.IsDrawingMode)
+                {
+                    _overlay.Redo();
+                    handled = true;
+                }
+                break;
         }
         return nint.Zero;
     }
@@ -69,6 +89,8 @@ public sealed class HotkeyService : IDisposable
         {
             UnregisterHotKey(_hwnd, ID_TOGGLE);
             UnregisterHotKey(_hwnd, ID_CLEAR);
+            UnregisterHotKey(_hwnd, ID_UNDO);
+            UnregisterHotKey(_hwnd, ID_REDO);
         }
         _source?.RemoveHook(Hook);
     }

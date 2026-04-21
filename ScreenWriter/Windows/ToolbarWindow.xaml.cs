@@ -37,6 +37,7 @@ public partial class ToolbarWindow : Window
     public event Action?              ExitRequested;
     public event Action?              AboutRequested;
     public event Action?              LangToggleRequested;
+    public event Action?              PositionToggleRequested;
 
     // ── Slide animation ───────────────────────────────────────────────────────
     private const double TriggerHeight = 4;
@@ -69,6 +70,7 @@ public partial class ToolbarWindow : Window
             _hiddenTop = -(ActualHeight - TriggerHeight);
             SetActiveTool(DrawingTool.Pen, BtnPen);
             BringToTopmost();
+            ApplyPosition(SettingsService.Instance.ToolbarOnRight);
             _hideDelayTimer.Start();
         };
     }
@@ -106,6 +108,39 @@ public partial class ToolbarWindow : Window
         SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
     }
 
+    // ── Position toggle ───────────────────────────────────────────────────────
+    public void ApplyPosition(bool onRight)
+    {
+        if (onRight)
+        {
+            Left = SystemParameters.PrimaryScreenWidth - ActualWidth;
+            ToolbarBorder.CornerRadius = new CornerRadius(0, 0, 0, 12);
+        }
+        else
+        {
+            Left = 0;
+            ToolbarBorder.CornerRadius = new CornerRadius(0, 0, 12, 0);
+        }
+    }
+
+    // ── Restore saved settings ────────────────────────────────────────────────
+    public void RestoreInitialTool(DrawingTool tool)
+    {
+        var btn = tool switch
+        {
+            DrawingTool.Arrow     => BtnArrow,
+            DrawingTool.Line      => BtnLine,
+            DrawingTool.Rectangle => BtnRect,
+            DrawingTool.Ellipse   => BtnEllipse,
+            DrawingTool.Text      => BtnText,
+            _                     => BtnPen,
+        };
+        SetActiveTool(tool, btn);
+    }
+
+    public void RestoreInitialPenSize(double size)
+        => SizeSlider.Value = size;
+
     // ── Mode indicator ────────────────────────────────────────────────────────
     private void BtnToggleMode_Click(object sender, RoutedEventArgs e)
         => DrawingModeToggleRequested?.Invoke();
@@ -138,6 +173,7 @@ public partial class ToolbarWindow : Window
 
     // ── Tool buttons ──────────────────────────────────────────────────────────
     private void BtnPen_Click    (object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Pen,       BtnPen);
+    private void BtnArrow_Click  (object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Arrow,     BtnArrow);
     private void BtnLine_Click   (object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Line,      BtnLine);
     private void BtnRect_Click   (object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Rectangle, BtnRect);
     private void BtnEllipse_Click(object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Ellipse,   BtnEllipse);
@@ -180,10 +216,11 @@ public partial class ToolbarWindow : Window
         => PenSizeChanged?.Invoke(e.NewValue);
 
     // ── Undo / Redo / Clear / Close / About / Lang ────────────────────────────
-    private void BtnUndo_Click (object sender, RoutedEventArgs e) => UndoRequested?.Invoke();
-    private void BtnRedo_Click (object sender, RoutedEventArgs e) => RedoRequested?.Invoke();
-    private void BtnClear_Click(object sender, RoutedEventArgs e) => ClearRequested?.Invoke();
-    private void BtnClose_Click(object sender, RoutedEventArgs e) => ExitRequested?.Invoke();
-    private void BtnAbout_Click(object sender, RoutedEventArgs e) => AboutRequested?.Invoke();
-    private void BtnLang_Click (object sender, RoutedEventArgs e) => LangToggleRequested?.Invoke();
+    private void BtnUndo_Click    (object sender, RoutedEventArgs e) => UndoRequested?.Invoke();
+    private void BtnRedo_Click    (object sender, RoutedEventArgs e) => RedoRequested?.Invoke();
+    private void BtnClear_Click   (object sender, RoutedEventArgs e) => ClearRequested?.Invoke();
+    private void BtnClose_Click   (object sender, RoutedEventArgs e) => ExitRequested?.Invoke();
+    private void BtnAbout_Click   (object sender, RoutedEventArgs e) => AboutRequested?.Invoke();
+    private void BtnLang_Click    (object sender, RoutedEventArgs e) => LangToggleRequested?.Invoke();
+    private void BtnPosition_Click(object sender, RoutedEventArgs e) => PositionToggleRequested?.Invoke();
 }

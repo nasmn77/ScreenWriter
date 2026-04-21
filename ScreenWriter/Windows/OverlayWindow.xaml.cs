@@ -13,6 +13,7 @@ using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Rectangle      = System.Windows.Shapes.Rectangle;
 using Brushes        = System.Windows.Media.Brushes;
 using TextBox        = System.Windows.Controls.TextBox;
+using Path           = System.Windows.Shapes.Path;
 
 using ScreenWriter.Models;
 using ScreenWriter.Services;
@@ -258,7 +259,7 @@ public partial class OverlayWindow : Window
         Mouse.Capture(null);
 
         var (_, _, w, h) = NormalizeRect(_shapeStart, e.GetPosition(Canvas));
-        if (w < 2 && h < 2 && _currentTool != DrawingTool.Line)
+        if (w < 2 && h < 2 && _currentTool is not DrawingTool.Line and not DrawingTool.Arrow)
         {
             Canvas.Children.Remove(_previewShape);
             _previewShape = null;
@@ -299,9 +300,19 @@ public partial class OverlayWindow : Window
                 Width = Math.Max(w, 1), Height = Math.Max(h, 1),
                 Stroke = brush, StrokeThickness = t, Fill = Brushes.Transparent,
             }, x, y),
-            _ => throw new InvalidOperationException(),
-        };
-    }
+        DrawingTool.Arrow => new Path
+        {
+            Tag             = t,
+            Data            = ComputeArrowGeometry(a, b, t),
+            Stroke          = brush,
+            Fill            = brush,
+            StrokeThickness = t,
+            StrokeStartLineCap = PenLineCap.Round,
+            StrokeEndLineCap   = PenLineCap.Round,
+        },
+        _ => throw new InvalidOperationException(),
+    };
+}
 
     private static void UpdateShape(Shape shape, Point a, Point b)
     {
@@ -319,7 +330,46 @@ public partial class OverlayWindow : Window
                 el.Width = Math.Max(w, 1); el.Height = Math.Max(h, 1);
                 Positioned(el, x, y);
                 break;
+            case Path p when p.Tag is double th:
+                p.Data = ComputeArrowGeometry(a, b, th);
+                break;
         }
+    }
+
+    private static Geometry ComputeArrowGeometry(Point a, Point b, double thickness)
+    {
+        var dx  = b.X - a.X;
+        var dy  = b.Y - a.Y;
+        var len = Math.Sqrt(dx * dx + dy * dy);
+        if (len < 2) return new LineGeometry(a, b);
+
+        var nx = dx / len;
+        var ny = dy / len;
+        // perpendicular
+        var px = -ny;
+        var py = nx;
+
+        var arrowLen = Math.Min(Math.Max(thickness * 5, 20.0), len * 0.45);
+        var arrowWid = Math.Min(Math.Max(thickness * 2.5, 10.0), arrowLen * 0.6);
+
+        // Shaft end (where arrow head base meets the shaft)
+        var shaftEnd = new Point(b.X - nx * arrowLen, b.Y - ny * arrowLen);
+
+        var tip   = b;
+        var base1 = new Point(shaftEnd.X + px * arrowWid, shaftEnd.Y + py * arrowWid);
+        var base2 = new Point(shaftEnd.X - px * arrowWid, shaftEnd.Y - py * arrowWid);
+
+        var group = new GeometryGroup { FillRule = FillRule.Nonzero };
+        group.Children.Add(new LineGeometry(a, shaftEnd));
+
+        var head = new PathGeometry();
+        var fig  = new PathFigure { StartPoint = tip, IsClosed = true, IsFilled = true };
+        fig.Segments.Add(new LineSegment(base1, true));
+        fig.Segments.Add(new LineSegment(base2, true));
+        head.Figures.Add(fig);
+        group.Children.Add(head);
+
+        return group;
     }
 
     private static T Positioned<T>(T shape, double x, double y) where T : Shape

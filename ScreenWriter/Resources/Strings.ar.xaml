@@ -25,6 +25,7 @@
     <sys:String x:Key="Str_ToolEllipse">دائرة / بيضاوي</sys:String>
     <sys:String x:Key="Str_ToolText">كتابة نص</sys:String>
     <sys:String x:Key="Str_ToolEraser">ممحاة</sys:String>
+    <sys:String x:Key="Str_ToolArrow">سهم</sys:String>
 
     <!-- Actions -->
     <sys:String x:Key="Str_Undo">تراجع</sys:String>
@@ -32,6 +33,7 @@
     <sys:String x:Key="Str_ClearAll">مسح الكل</sys:String>
     <sys:String x:Key="Str_About">عن البرنامج</sys:String>
     <sys:String x:Key="Str_Close">إغلاق التطبيق</sys:String>
+    <sys:String x:Key="Str_TogglePosition">تغيير موضع الشريط</sys:String>
     <sys:String x:Key="Str_LangToggle">EN</sys:String>
 
     <!-- Dialogs -->
