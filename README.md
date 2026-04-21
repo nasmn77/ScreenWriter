@@ -10,7 +10,7 @@
 
 حمّل التطبيق من صفحة التحميل الرسمية:
 
-### 👉 <a href="https://docs.naseralmadi.cloud/apps/ar/" target="_blank">https://docs.naseralmadi.cloud/apps/ar/</a>
+### 👉 https://docs.naseralmadi.cloud/apps/ar/
 
 ---
 
@@ -192,7 +192,7 @@ A Windows app for drawing and annotating directly on screen, designed for explai
 
 Download the app from the official page:
 
-### 👉 <a href="https://docs.naseralmadi.cloud/apps/en/" target="_blank">https://docs.naseralmadi.cloud/apps/en/</a>
+### 👉 https://docs.naseralmadi.cloud/apps/en/
 
 ---
 
