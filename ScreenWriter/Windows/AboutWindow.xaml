@@ -9,11 +9,7 @@
         ShowInTaskbar="False"
         ResizeMode="NoResize"
         Topmost="True"
-<<<<<<< HEAD
         Icon="pack://application:,,,/ScreenWriter;component/Assets/icon.ico"
-=======
-        Icon="/Assets/icon.ico"
->>>>>>> b9f096ab2639dedceca24d252207d629bdb07d99
         Title="{DynamicResource Str_AboutTitle}">
 
     <Window.Resources>

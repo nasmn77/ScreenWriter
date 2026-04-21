@@ -247,7 +247,6 @@ public partial class OverlayWindow : Window
 
         Canvas.Children.Remove(hit);
         var removed = hit;
-        _redoStack.Clear();
         _undoStack.Push(new(
             Undo: () => Canvas.Children.Add(removed),
             Redo: () => Canvas.Children.Remove(removed)));
