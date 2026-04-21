@@ -24,18 +24,35 @@ public sealed class TrayService : IDisposable
         };
 
         _icon.DoubleClick += (_, _) => Dispatch(Toggle);
+
+        LocalizationService.Instance.LanguageChanged += RebuildMenu;
     }
 
     private ContextMenuStrip BuildMenu()
     {
+        var svc  = LocalizationService.Instance;
         var menu = new ContextMenuStrip();
-        menu.Items.Add("تفعيل / إيقاف الرسم  (Ctrl+Alt+D)", null, (_, _) => Dispatch(Toggle));
-        menu.Items.Add("إظهار / إخفاء شريط الأدوات",         null, (_, _) => Dispatch(ToggleToolbar));
+        menu.Items.Add(svc.Get("Str_TrayToggleDraw"),    null, (_, _) => Dispatch(Toggle));
+        menu.Items.Add(svc.Get("Str_TrayToggleToolbar"), null, (_, _) => Dispatch(ToggleToolbar));
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add("مسح الكل  (Ctrl+Alt+C)",             null, (_, _) => Dispatch(_overlay.ConfirmedClearAll));
+        menu.Items.Add(svc.Get("Str_TrayClearAll"),      null, (_, _) => Dispatch(_overlay.ConfirmedClearAll));
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add("خروج",                               null, (_, _) => Dispatch(System.Windows.Application.Current.Shutdown));
+        menu.Items.Add(svc.Get("Str_TrayExit"),          null, (_, _) => Dispatch(System.Windows.Application.Current.Shutdown));
         return menu;
+    }
+
+    private void RebuildMenu()
+    {
+        if (System.Windows.Application.Current.Dispatcher.CheckAccess())
+        {
+            var old = _icon.ContextMenuStrip;
+            _icon.ContextMenuStrip = BuildMenu();
+            old?.Dispose();
+        }
+        else
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(RebuildMenu);
+        }
     }
 
     private void Toggle()
@@ -55,12 +72,15 @@ public sealed class TrayService : IDisposable
 
     private static Icon CreateIcon()
     {
-        var exeDir  = AppContext.BaseDirectory;
-        var icoPath = System.IO.Path.Combine(exeDir, "Assets", "icon.ico");
-        if (System.IO.File.Exists(icoPath))
-            return new Icon(icoPath, 32, 32);
+        try
+        {
+            var sri = System.Windows.Application.GetResourceStream(
+                new Uri("pack://application:,,,/Assets/icon.ico"));
+            if (sri != null)
+                return new Icon(sri.Stream, 32, 32);
+        }
+        catch { }
 
-        // Fallback: programmatic icon
         using var bmp = new Bitmap(32, 32);
         using var g   = Graphics.FromImage(bmp);
         g.Clear(Color.Transparent);
@@ -74,6 +94,7 @@ public sealed class TrayService : IDisposable
 
     public void Dispose()
     {
+        LocalizationService.Instance.LanguageChanged -= RebuildMenu;
         _icon.Visible = false;
         _icon.Dispose();
     }

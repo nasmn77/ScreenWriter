@@ -1,0 +1,59 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Toolbar / Mode -->
+    <sys:String x:Key="Str_ToggleMode">تفعيل / إيقاف الرسم  (Ctrl+Alt+D)</sys:String>
+    <sys:String x:Key="Str_ModeActive">إيقاف</sys:String>
+    <sys:String x:Key="Str_ModeInactive">رسم</sys:String>
+
+    <!-- Colors -->
+    <sys:String x:Key="Str_Red">أحمر</sys:String>
+    <sys:String x:Key="Str_Orange">برتقالي</sys:String>
+    <sys:String x:Key="Str_Yellow">أصفر</sys:String>
+    <sys:String x:Key="Str_Green">أخضر</sys:String>
+    <sys:String x:Key="Str_Blue">أزرق</sys:String>
+    <sys:String x:Key="Str_Purple">بنفسجي</sys:String>
+    <sys:String x:Key="Str_White">أبيض</sys:String>
+    <sys:String x:Key="Str_Black">أسود</sys:String>
+
+    <!-- Drawing tools -->
+    <sys:String x:Key="Str_ToolPen">رسم حر</sys:String>
+    <sys:String x:Key="Str_ToolLine">خط مستقيم</sys:String>
+    <sys:String x:Key="Str_ToolRect">مستطيل</sys:String>
+    <sys:String x:Key="Str_ToolEllipse">دائرة / بيضاوي</sys:String>
+    <sys:String x:Key="Str_ToolText">كتابة نص</sys:String>
+    <sys:String x:Key="Str_ToolEraser">ممحاة</sys:String>
+
+    <!-- Actions -->
+    <sys:String x:Key="Str_Undo">تراجع</sys:String>
+    <sys:String x:Key="Str_Redo">إعادة</sys:String>
+    <sys:String x:Key="Str_ClearAll">مسح الكل</sys:String>
+    <sys:String x:Key="Str_About">عن البرنامج</sys:String>
+    <sys:String x:Key="Str_Close">إغلاق التطبيق</sys:String>
+    <sys:String x:Key="Str_LangToggle">EN</sys:String>
+
+    <!-- Dialogs -->
+    <sys:String x:Key="Str_ClearConfirmTitle">مسح الكل</sys:String>
+    <sys:String x:Key="Str_ClearConfirmMsg">هل تريد مسح جميع الرسومات؟</sys:String>
+
+    <!-- Tray -->
+    <sys:String x:Key="Str_TrayToggleDraw">تفعيل / إيقاف الرسم  (Ctrl+Alt+D)</sys:String>
+    <sys:String x:Key="Str_TrayToggleToolbar">إظهار / إخفاء شريط الأدوات</sys:String>
+    <sys:String x:Key="Str_TrayClearAll">مسح الكل  (Ctrl+Alt+C)</sys:String>
+    <sys:String x:Key="Str_TrayExit">خروج</sys:String>
+
+    <!-- App-level -->
+    <sys:String x:Key="Str_AlreadyRunning">التطبيق يعمل بالفعل.</sys:String>
+    <sys:String x:Key="Str_CheckTray">تحقق من شريط المهام (System Tray).</sys:String>
+
+    <!-- Splash -->
+    <sys:String x:Key="Str_SplashTagline">رسم وتوضيح فوق الشاشة</sys:String>
+
+    <!-- About -->
+    <sys:String x:Key="Str_AboutTitle">عن البرنامج</sys:String>
+    <sys:String x:Key="Str_AboutDescription">تطبيق رسم وتوضيح فوق الشاشة</sys:String>
+    <sys:String x:Key="Str_AuthorName">ناصر الماضي</sys:String>
+
+</ResourceDictionary>

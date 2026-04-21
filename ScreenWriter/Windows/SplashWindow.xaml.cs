@@ -15,13 +15,17 @@ public partial class SplashWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "icon.ico");
-        if (System.IO.File.Exists(iconPath))
+        try
         {
-            using var stream = System.IO.File.OpenRead(iconPath);
-            var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-            AppIcon.Source = decoder.Frames.OrderByDescending(f => f.PixelWidth).First();
+            var sri = System.Windows.Application.GetResourceStream(
+                new Uri("pack://application:,,,/Assets/icon.ico"));
+            if (sri != null)
+            {
+                var decoder = BitmapDecoder.Create(sri.Stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                AppIcon.Source = decoder.Frames.OrderByDescending(f => f.PixelWidth).First();
+            }
         }
+        catch { }
 
         var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.5));
         fadeIn.Completed += (_, _) =>

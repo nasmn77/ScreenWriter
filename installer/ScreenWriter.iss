@@ -1,6 +1,6 @@
 #define MyAppName "Screen Writer"
 #define MyAppVersion "1.0"
-#define MyAppPublisher "nasmn77"
+#define MyAppPublisher "Naser Almadi"
 #define MyAppURL "https://github.com/nasmn77/ScreenWriter"
 #define MyAppExeName "ScreenWriter.exe"
 #define PublishDir "..\publish"
@@ -50,3 +50,50 @@ Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; \
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "تشغيل {#MyAppName} الآن"; \
   Flags: nowait postinstall skipifsilent
+
+[Code]
+const
+  UninstallKey = 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A3F2B1C4-7E5D-4F8A-9B2C-1D3E5F6A7B8C}_is1';
+
+function GetUninstallString(): String;
+var
+  sVal: String;
+begin
+  sVal := '';
+  if not RegQueryStringValue(HKCU, UninstallKey, 'UninstallString', sVal) then
+    RegQueryStringValue(HKLM, UninstallKey, 'UninstallString', sVal);
+  Result := sVal;
+end;
+
+function InitializeSetup(): Boolean;
+var
+  sUninstall: String;
+  iCode: Integer;
+  iBtn: Integer;
+begin
+  Result := True;
+
+  sUninstall := GetUninstallString();
+  if sUninstall = '' then Exit;
+
+  iBtn := MsgBox(
+    '{#MyAppName} مثبَّت بالفعل على هذا الجهاز.' + #13#10#13#10 +
+    'اضغط "نعم" لإصلاح التطبيق وإعادة تثبيته.' + #13#10 +
+    'اضغط "لا" لإلغاء التثبيت نهائياً.' + #13#10 +
+    'اضغط "إلغاء" للخروج بدون تغيير.',
+    mbConfirmation, MB_YESNOCANCEL);
+
+  if iBtn = IDYES then
+  begin
+    Result := True;
+  end
+  else if iBtn = IDNO then
+  begin
+    Exec(RemoveQuotes(sUninstall), '/SILENT', '', SW_SHOW, ewWaitUntilTerminated, iCode);
+    Result := False;
+  end
+  else
+  begin
+    Result := False;
+  end;
+end;

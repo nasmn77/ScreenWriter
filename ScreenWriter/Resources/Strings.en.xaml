@@ -1,0 +1,59 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Toolbar / Mode -->
+    <sys:String x:Key="Str_ToggleMode">Toggle Draw  (Ctrl+Alt+D)</sys:String>
+    <sys:String x:Key="Str_ModeActive">Stop</sys:String>
+    <sys:String x:Key="Str_ModeInactive">Draw</sys:String>
+
+    <!-- Colors -->
+    <sys:String x:Key="Str_Red">Red</sys:String>
+    <sys:String x:Key="Str_Orange">Orange</sys:String>
+    <sys:String x:Key="Str_Yellow">Yellow</sys:String>
+    <sys:String x:Key="Str_Green">Green</sys:String>
+    <sys:String x:Key="Str_Blue">Blue</sys:String>
+    <sys:String x:Key="Str_Purple">Purple</sys:String>
+    <sys:String x:Key="Str_White">White</sys:String>
+    <sys:String x:Key="Str_Black">Black</sys:String>
+
+    <!-- Drawing tools -->
+    <sys:String x:Key="Str_ToolPen">Free Draw</sys:String>
+    <sys:String x:Key="Str_ToolLine">Straight Line</sys:String>
+    <sys:String x:Key="Str_ToolRect">Rectangle</sys:String>
+    <sys:String x:Key="Str_ToolEllipse">Circle / Ellipse</sys:String>
+    <sys:String x:Key="Str_ToolText">Text</sys:String>
+    <sys:String x:Key="Str_ToolEraser">Eraser</sys:String>
+
+    <!-- Actions -->
+    <sys:String x:Key="Str_Undo">Undo</sys:String>
+    <sys:String x:Key="Str_Redo">Redo</sys:String>
+    <sys:String x:Key="Str_ClearAll">Clear All</sys:String>
+    <sys:String x:Key="Str_About">About</sys:String>
+    <sys:String x:Key="Str_Close">Close</sys:String>
+    <sys:String x:Key="Str_LangToggle">ع</sys:String>
+
+    <!-- Dialogs -->
+    <sys:String x:Key="Str_ClearConfirmTitle">Clear All</sys:String>
+    <sys:String x:Key="Str_ClearConfirmMsg">Clear all drawings?</sys:String>
+
+    <!-- Tray -->
+    <sys:String x:Key="Str_TrayToggleDraw">Toggle Draw  (Ctrl+Alt+D)</sys:String>
+    <sys:String x:Key="Str_TrayToggleToolbar">Show / Hide Toolbar</sys:String>
+    <sys:String x:Key="Str_TrayClearAll">Clear All  (Ctrl+Alt+C)</sys:String>
+    <sys:String x:Key="Str_TrayExit">Exit</sys:String>
+
+    <!-- App-level -->
+    <sys:String x:Key="Str_AlreadyRunning">Screen Writer is already running.</sys:String>
+    <sys:String x:Key="Str_CheckTray">Check the System Tray.</sys:String>
+
+    <!-- Splash -->
+    <sys:String x:Key="Str_SplashTagline">Draw and annotate on screen</sys:String>
+
+    <!-- About -->
+    <sys:String x:Key="Str_AboutTitle">About</sys:String>
+    <sys:String x:Key="Str_AboutDescription">Draw and annotate on screen</sys:String>
+    <sys:String x:Key="Str_AuthorName">Naser Almadi</sys:String>
+
+</ResourceDictionary>

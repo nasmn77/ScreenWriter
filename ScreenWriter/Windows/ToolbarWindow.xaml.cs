@@ -11,6 +11,7 @@ using Button         = System.Windows.Controls.Button;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 using ScreenWriter.Models;
+using ScreenWriter.Services;
 
 namespace ScreenWriter.Windows;
 
@@ -33,9 +34,12 @@ public partial class ToolbarWindow : Window
     public event Action?              ClearRequested;
     public event Action?              DrawingModeToggleRequested;
     public event Action<DrawingTool>? ToolChanged;
+    public event Action?              ExitRequested;
+    public event Action?              AboutRequested;
+    public event Action?              LangToggleRequested;
 
     // ── Slide animation ───────────────────────────────────────────────────────
-    private const double TriggerHeight = 4;          // pixels visible when hidden
+    private const double TriggerHeight = 4;
     private double _hiddenTop;
     private double _targetTop;
 
@@ -46,13 +50,16 @@ public partial class ToolbarWindow : Window
     private static readonly SolidColorBrush ActiveBrush   = new(Color.FromRgb(6, 214, 160));
     private static readonly SolidColorBrush InactiveBrush = new(Color.FromRgb(0xCC, 0xCC, 0xCC));
 
-    private Button?     _activeToolBtn;
-    private bool        _eraserActive;
+    private Button? _activeToolBtn;
+    private bool    _eraserActive;
+    private bool    _currentModeIsDrawing;
 
     // ─────────────────────────────────────────────────────────────────────────
     public ToolbarWindow()
     {
         InitializeComponent();
+
+        LocalizationService.Instance.LanguageChanged += () => SyncMode(_currentModeIsDrawing);
 
         _slideTimer.Tick     += OnSlide;
         _hideDelayTimer.Tick += (_, _) => { _hideDelayTimer.Stop(); SlideTo(_hiddenTop); };
@@ -105,8 +112,10 @@ public partial class ToolbarWindow : Window
 
     public void SyncMode(bool isDrawing)
     {
+        _currentModeIsDrawing   = isDrawing;
+        var svc                 = LocalizationService.Instance;
         ModeIndicator.Fill      = isDrawing ? ActiveBrush : new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55));
-        ModeText.Text           = isDrawing ? "إيقاف" : "رسم";
+        ModeText.Text           = isDrawing ? svc.Get("Str_ModeActive") : svc.Get("Str_ModeInactive");
         ModeText.Foreground     = isDrawing ? ActiveBrush : InactiveBrush;
     }
 
@@ -119,7 +128,6 @@ public partial class ToolbarWindow : Window
         _activeColorBtn = btn;
         btn.BorderBrush = Brushes.White;
 
-        // Switch to pen if eraser was active
         if (_eraserActive) SetActiveTool(DrawingTool.Pen, BtnPen);
 
         var color = (Color)ColorConverter.ConvertFromString(btn.Tag as string ?? "#E63946");
@@ -155,7 +163,7 @@ public partial class ToolbarWindow : Window
 
     private void SetActiveTool(DrawingTool tool, Button btn)
     {
-        _eraserActive  = false;
+        _eraserActive        = false;
         BtnEraser.Foreground = InactiveBrush;
 
         if (_activeToolBtn is not null) _activeToolBtn.Foreground = InactiveBrush;
@@ -171,13 +179,11 @@ public partial class ToolbarWindow : Window
     private void SizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         => PenSizeChanged?.Invoke(e.NewValue);
 
-    public event Action? ExitRequested;
-    public event Action? AboutRequested;
-
-    // ── Undo / Redo / Clear ────────────────────────────────────────────────
+    // ── Undo / Redo / Clear / Close / About / Lang ────────────────────────────
     private void BtnUndo_Click (object sender, RoutedEventArgs e) => UndoRequested?.Invoke();
     private void BtnRedo_Click (object sender, RoutedEventArgs e) => RedoRequested?.Invoke();
     private void BtnClear_Click(object sender, RoutedEventArgs e) => ClearRequested?.Invoke();
     private void BtnClose_Click(object sender, RoutedEventArgs e) => ExitRequested?.Invoke();
     private void BtnAbout_Click(object sender, RoutedEventArgs e) => AboutRequested?.Invoke();
+    private void BtnLang_Click (object sender, RoutedEventArgs e) => LangToggleRequested?.Invoke();
 }
