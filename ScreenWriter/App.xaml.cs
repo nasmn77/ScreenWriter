@@ -19,14 +19,18 @@ public partial class App : System.Windows.Application
         _mutex = new Mutex(true, MutexName, out bool createdNew);
         if (!createdNew)
         {
+            LocalizationService.Instance.Load();
+            var svc = LocalizationService.Instance;
             System.Windows.MessageBox.Show(
-                "التطبيق يعمل بالفعل.\nتحقق من شريط المهام (System Tray).",
+                $"{svc.Get("Str_AlreadyRunning")}\n{svc.Get("Str_CheckTray")}",
                 "Screen Writer",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
             Shutdown();
             return;
         }
+
+        LocalizationService.Instance.Load();
 
         base.OnStartup(e);
 
@@ -44,23 +48,20 @@ public partial class App : System.Windows.Application
         {
             _overlay.ToggleDrawingMode();
             _toolbar.SyncMode(_overlay.IsDrawingMode);
-            _toolbar.BringToTopmost();   // toolbar always above overlay
+            _toolbar.BringToTopmost();
         };
-        _toolbar.ColorChanged += color => _overlay.SetColor(color);
-        _toolbar.PenSizeChanged += size => _overlay.SetPenSize(size);
-        _toolbar.ToolChanged   += tool   => _overlay.SetTool(tool);
-        _toolbar.EraserToggled += eraser => _overlay.SetEraser(eraser);
-        _toolbar.UndoRequested += () => _overlay.Undo();
-        _toolbar.RedoRequested += () => _overlay.Redo();
-        _toolbar.ClearRequested += () => _overlay.ConfirmedClearAll();
-        _toolbar.ExitRequested  += () => Shutdown();
-        _toolbar.AboutRequested += () =>
-        {
-            var about = new AboutWindow();
-            about.Show();
-        };
+        _toolbar.ColorChanged   += color  => _overlay.SetColor(color);
+        _toolbar.PenSizeChanged += size   => _overlay.SetPenSize(size);
+        _toolbar.ToolChanged    += tool   => _overlay.SetTool(tool);
+        _toolbar.EraserToggled  += eraser => _overlay.SetEraser(eraser);
+        _toolbar.UndoRequested  += ()     => _overlay.Undo();
+        _toolbar.RedoRequested  += ()     => _overlay.Redo();
+        _toolbar.ClearRequested += ()     => _overlay.ConfirmedClearAll();
+        _toolbar.ExitRequested  += ()     => Shutdown();
+        _toolbar.AboutRequested += ()     => new AboutWindow().Show();
+        _toolbar.LangToggleRequested += () => LocalizationService.Instance.Switch();
 
-        _tray = new TrayService(_overlay, _toolbar);
+        _tray    = new TrayService(_overlay, _toolbar);
         _hotkeys = new HotkeyService(_overlay, _toolbar);
 
         _overlay.Show();

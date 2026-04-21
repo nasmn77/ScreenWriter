@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screen Writer</title>
+<link rel="icon" href="../icon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-1: #0b0420;
+    --bg-2: #150936;
+    --bg-3: #0a1b3d;
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-strong: rgba(255, 255, 255, 0.09);
+    --line: rgba(255, 255, 255, 0.12);
+    --text: #f5f2ff;
+    --text-dim: #b8b0d9;
+    --violet: #a78bfa;
+    --mint: #5eead4;
+    --rose: #f9a8d4;
+    --amber: #fbbf24;
+    --cyan: #67e8f9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg-1);
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.55; mix-blend-mode: screen; will-change: transform; }
+  .b1 { width: 700px; height: 700px; background: radial-gradient(circle at center, #7c3aed 0%, transparent 60%); top: -200px; left: -100px; animation: float1 28s ease-in-out infinite; }
+  .b2 { width: 600px; height: 600px; background: radial-gradient(circle at center, #06b6d4 0%, transparent 60%); top: 10%; right: -150px; animation: float2 34s ease-in-out infinite; }
+  .b3 { width: 500px; height: 500px; background: radial-gradient(circle at center, #ec4899 0%, transparent 60%); bottom: 10%; left: 20%; animation: float3 30s ease-in-out infinite; }
+  .b4 { width: 400px; height: 400px; background: radial-gradient(circle at center, #14b8a6 0%, transparent 60%); bottom: 5%; right: 10%; animation: float1 36s ease-in-out infinite reverse; }
+  @keyframes float1 { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(100px, -60px) scale(1.1); } 66% { transform: translate(-80px, 80px) scale(0.95); } }
+  @keyframes float2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-120px, 100px) scale(1.15); } }
+  @keyframes float3 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(80px, -100px) scale(1.08); } }
+
+  .grain { position: fixed; inset: 0; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.35'/></svg>"); opacity: 0.08; pointer-events: none; z-index: 2; mix-blend-mode: overlay; }
+  .grid-bg { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; z-index: 1; mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%); }
+
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 30px; position: relative; z-index: 5; }
+
+  nav { position: sticky; top: 16px; z-index: 50; max-width: 1200px; margin: 16px auto 0; padding: 0 30px; }
+  nav .inner { background: rgba(20, 10, 50, 0.5); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid var(--line); border-radius: 999px; padding: 12px 20px 12px 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+  nav .logo { display: flex; align-items: center; gap: 12px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.5px; }
+  nav a.cta { background: linear-gradient(135deg, var(--violet), var(--cyan)); color: var(--bg-1); padding: 10px 22px; text-decoration: none; border-radius: 999px; font-weight: 700; font-size: 14px; transition: all .3s ease; box-shadow: 0 0 20px rgba(167, 139, 250, 0.4); }
+  nav a.cta:hover { box-shadow: 0 0 35px rgba(167, 139, 250, 0.7); transform: translateY(-1px); }
+  nav a.lang { background: var(--glass); color: var(--text-dim); padding: 10px 18px; text-decoration: none; border-radius: 999px; font-weight: 600; font-size: 14px; border: 1px solid var(--line); backdrop-filter: blur(10px); transition: all .3s ease; }
+  nav a.lang:hover { background: var(--glass-strong); color: var(--text); border-color: rgba(255,255,255,0.25); }
+  nav .nav-actions { display: flex; align-items: center; gap: 10px; }
+
+  .hero { padding: 100px 0 120px; text-align: center; position: relative; }
+  .hero .badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px 6px 6px; background: var(--glass); border: 1px solid var(--line); border-radius: 999px; font-size: 12px; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 40px; backdrop-filter: blur(10px); }
+  .hero .badge .dot { display: inline-grid; place-items: center; background: linear-gradient(135deg, var(--mint), var(--cyan)); color: var(--bg-1); width: 22px; height: 22px; border-radius: 50%; font-size: 13px; font-weight: 700; }
+  .hero h1 { font-family: 'Cairo', sans-serif; font-weight: 800; font-size: clamp(60px, 10vw, 130px); line-height: 1.05; letter-spacing: -2px; margin-bottom: 30px; background: linear-gradient(180deg, #fff 0%, #b8b0d9 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero h1 em { font-style: normal; font-weight: 900; background: linear-gradient(135deg, var(--violet) 0%, var(--cyan) 50%, var(--rose) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p.lede { font-size: 22px; line-height: 1.7; color: var(--text-dim); max-width: 680px; margin: 0 auto 50px; font-weight: 400; }
+  .hero-ctas { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+  .btn-primary { background: linear-gradient(135deg, var(--violet), var(--cyan)); color: var(--bg-1); padding: 16px 32px; border-radius: 999px; text-decoration: none; font-weight: 700; font-size: 16px; transition: all .3s ease; box-shadow: 0 10px 40px rgba(167, 139, 250, 0.4); display: inline-flex; align-items: center; gap: 10px; }
+  .btn-primary:hover { box-shadow: 0 15px 50px rgba(167, 139, 250, 0.6); transform: translateY(-2px); }
+  .btn-ghost { background: var(--glass); color: var(--text); padding: 16px 32px; border-radius: 999px; text-decoration: none; font-weight: 500; font-size: 16px; border: 1px solid var(--line); backdrop-filter: blur(10px); transition: all .3s ease; }
+  .btn-ghost:hover { background: var(--glass-strong); border-color: rgba(255,255,255,0.25); }
+
+  .preview-wrap { max-width: 980px; margin: 70px auto 0; padding: 0 20px; }
+  .preview { background: rgba(255,255,255,0.05); backdrop-filter: blur(30px) saturate(160%); border: 1px solid var(--line); border-radius: 20px; padding: 20px; box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 100px rgba(167,139,250,0.15), inset 0 1px 0 rgba(255,255,255,0.1); position: relative; }
+  .preview::before { content: ''; position: absolute; inset: -1px; border-radius: 20px; padding: 1px; background: linear-gradient(135deg, rgba(167,139,250,0.5), transparent 30%, transparent 70%, rgba(103,232,249,0.3)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+  .mock-toolbar { background: rgba(15,10,35,0.85); border-radius: 0 0 12px 0; padding: 8px 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); direction: ltr; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+  .mock-toolbar .on { display: flex; align-items: center; gap: 5px; color: var(--mint); font-size: 12px; padding: 0 8px; }
+  .mock-toolbar .on::before { content: ''; width: 8px; height: 8px; background: var(--mint); border-radius: 50%; box-shadow: 0 0 10px var(--mint); }
+  .mock-toolbar .sep { width: 1px; height: 18px; background: rgba(255,255,255,0.15); margin: 0 4px; }
+  .mock-toolbar .swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); }
+  .mock-toolbar .ico { color: rgba(255,255,255,0.7); font-size: 14px; padding: 0 6px; cursor: pointer; }
+  .mock-toolbar .ico:hover { color: var(--cyan); }
+  .canvas-area { min-height: 320px; position: relative; padding: 40px; }
+  .canvas-area svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .canvas-area .word { position: absolute; font-family: 'Cairo', sans-serif; font-style: italic; font-size: 48px; font-weight: 400; }
+  .w1 { top: 30px; right: 30px; color: var(--rose); }
+  .w2 { bottom: 60px; left: 50px; color: var(--cyan); font-size: 36px; }
+
+  .sec-head { text-align: center; margin-bottom: 60px; padding-top: 80px; }
+  .sec-head .kicker { display: inline-block; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; color: var(--violet); margin-bottom: 18px; padding: 6px 16px; border: 1px solid rgba(167,139,250,0.3); border-radius: 999px; background: rgba(167,139,250,0.08); }
+  .sec-head h2 { font-family: 'Cairo', sans-serif; font-weight: 700; font-size: clamp(42px, 6vw, 76px); line-height: 1.15; letter-spacing: -1.5px; max-width: 800px; margin: 0 auto; }
+  .sec-head h2 em { font-style: normal; font-weight: 900; background: linear-gradient(135deg, var(--violet), var(--mint)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+  .bento { display: grid; grid-template-columns: repeat(6, 1fr); grid-auto-rows: minmax(180px, auto); gap: 16px; }
+  .card { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px) saturate(140%); border: 1px solid var(--line); border-radius: 20px; padding: 28px; position: relative; overflow: hidden; transition: all .4s cubic-bezier(.2,.7,.2,1); }
+  .card:hover { border-color: rgba(167,139,250,0.4); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+  .card::before { content: ''; position: absolute; width: 200px; height: 200px; background: radial-gradient(circle, rgba(167,139,250,0.3), transparent 70%); top: -100px; left: -100px; opacity: 0; transition: opacity .4s; pointer-events: none; }
+  .card:hover::before { opacity: 1; }
+  .card .glyph { display: inline-grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(103,232,249,0.1)); border: 1px solid rgba(167,139,250,0.3); font-size: 24px; margin-bottom: 18px; color: var(--violet); }
+  .card h3 { font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 24px; line-height: 1.35; margin-bottom: 10px; letter-spacing: -0.3px; }
+  .card p { color: var(--text-dim); font-size: 15px; line-height: 1.75; }
+  .card.span-3 { grid-column: span 3; }
+  .card.span-2 { grid-column: span 2; }
+  .card.span-4 { grid-column: span 4; }
+  .card.tall { grid-row: span 2; }
+  .card.feature-hero { grid-column: span 3; grid-row: span 2; background: radial-gradient(circle at 80% 20%, rgba(167,139,250,0.25), transparent 50%), radial-gradient(circle at 20% 80%, rgba(103,232,249,0.15), transparent 50%), rgba(255,255,255,0.04); display: flex; flex-direction: column; justify-content: space-between; }
+  .card.feature-hero h3 { font-size: 32px; line-height: 1.25; font-weight: 800; }
+  .card.feature-hero .colors { display: flex; gap: 10px; margin-top: 20px; }
+  .card.feature-hero .colors span { width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform .3s; }
+  .card.feature-hero .colors span:hover { transform: translateY(-4px) scale(1.1); }
+
+  .keys-wrap { max-width: 900px; margin: 60px auto 0; }
+  .key-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px) saturate(140%); border: 1px solid var(--line); border-radius: 20px; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 16px; transition: all .3s; }
+  .key-card:hover { border-color: rgba(167,139,250,0.4); }
+  .key-card .desc { font-family: 'Cairo', sans-serif; font-size: 22px; font-weight: 600; }
+  .combo { display: flex; gap: 8px; direction: ltr; }
+  .kbd { font-family: 'Cairo', sans-serif; font-weight: 500; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 10px 16px; border-radius: 10px; font-size: 14px; color: var(--text); box-shadow: 0 2px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+
+  .downloads { padding-bottom: 120px; }
+  .dl-grid { display: flex; justify-content: center; margin-top: 60px; }
+  .dl-grid .dl-card { max-width: 420px; width: 100%; }
+  .dl-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px) saturate(140%); border: 1px solid var(--line); border-radius: 24px; padding: 36px 30px; position: relative; transition: all .4s cubic-bezier(.2,.7,.2,1); overflow: hidden; }
+  .dl-card:hover { transform: translateY(-8px); box-shadow: 0 30px 60px rgba(0,0,0,0.4); }
+  .dl-card:nth-child(1) { background: linear-gradient(135deg, rgba(94,234,212,0.12), transparent 50%), rgba(255,255,255,0.04); border-color: rgba(94,234,212,0.3); }
+  .dl-card:nth-child(1):hover { box-shadow: 0 30px 60px rgba(94,234,212,0.15); }
+  .dl-card .tag { display: inline-block; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; margin-bottom: 24px; color: var(--mint); background: rgba(94,234,212,0.12); border: 1px solid rgba(94,234,212,0.3); }
+  .dl-card h3 { font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 32px; line-height: 1.2; margin-bottom: 6px; letter-spacing: -0.3px; }
+  .dl-card h3 em { font-style: normal; font-weight: 500; opacity: 0.85; }
+  .dl-card p { color: var(--text-dim); font-size: 15px; line-height: 1.75; min-height: 60px; margin-bottom: 22px; }
+  .dl-btn { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 14px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 15px; color: var(--bg-1); transition: all .3s ease; background: linear-gradient(135deg, var(--mint), var(--cyan)); box-shadow: 0 10px 30px rgba(94,234,212,0.35); }
+  .dl-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+  .dl-btn::after { content: '↓'; font-size: 18px; }
+
+  footer { padding: 60px 30px 40px; border-top: 1px solid var(--line); text-align: center; position: relative; z-index: 5; background: rgba(11,4,32,0.6); backdrop-filter: blur(20px); }
+  footer .brand { font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 32px; margin-bottom: 14px; background: linear-gradient(135deg, var(--violet), var(--cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  footer .meta { color: var(--text-dim); font-size: 14px; font-weight: 500; letter-spacing: 1px; }
+
+  .dev-section { padding: 100px 30px; position: relative; z-index: 5; }
+  .dev-card { max-width: 600px; margin: 0 auto; background: var(--glass); border: 1px solid var(--line); border-radius: 28px; padding: 52px 48px; text-align: center; position: relative; overflow: hidden; backdrop-filter: blur(20px); }
+  .dev-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% -20%, rgba(167,139,250,0.12) 0%, transparent 60%); pointer-events: none; }
+  .dev-card .dev-avatar { width: 72px; height: 72px; border-radius: 50%; background: conic-gradient(from 120deg, var(--violet), var(--cyan), var(--rose), var(--violet)); display: grid; place-items: center; font-size: 32px; margin: 0 auto 22px; box-shadow: 0 0 40px rgba(167,139,250,0.4); }
+  .dev-card .dev-label { font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--violet); margin-bottom: 10px; opacity: 0.8; }
+  .dev-card .dev-name { font-size: 30px; font-weight: 800; background: linear-gradient(135deg, #fff 40%, var(--violet)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px; line-height: 1.2; }
+  .dev-card .dev-tagline { color: var(--text-dim); font-size: 14px; margin-bottom: 28px; }
+  .dev-card .dev-divider { width: 40px; height: 2px; background: linear-gradient(90deg, var(--violet), var(--cyan)); margin: 0 auto 28px; border-radius: 2px; }
+  .dev-card .email-btn { display: inline-flex; align-items: center; gap: 10px; background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.35); border-radius: 999px; padding: 12px 26px; color: var(--violet); text-decoration: none; font-size: 14px; font-weight: 600; transition: all .3s ease; direction: ltr; }
+  .dev-card .email-btn:hover { background: rgba(167,139,250,0.2); border-color: var(--violet); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(167,139,250,0.25); }
+  .dev-card .github-btn { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 999px; padding: 12px 26px; color: var(--text); text-decoration: none; font-size: 14px; font-weight: 600; transition: all .3s ease; direction: ltr; margin-top: 12px; }
+  .dev-card .github-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.35); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+  .opensource-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; background: rgba(94,234,212,0.08); border: 1px solid rgba(94,234,212,0.25); border-radius: 999px; font-size: 12px; color: var(--mint); font-weight: 600; letter-spacing: 1px; text-decoration: none; transition: all .3s ease; margin-top: 16px; }
+  .opensource-badge:hover { background: rgba(94,234,212,0.15); border-color: var(--mint); }
+
+  .reveal { opacity: 0; transform: translateY(30px); transition: all .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    .bento { grid-template-columns: repeat(2, 1fr); }
+    .card.span-3, .card.span-2, .card.span-4, .card.feature-hero { grid-column: span 2; grid-row: auto; }
+    .dl-grid .dl-card { max-width: 100%; }
+    nav .inner { padding: 10px 14px 10px 6px; }
+    nav .logo { font-size: 16px; }
+    .hero { padding: 60px 0 80px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="aurora">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="blob b4"></div>
+</div>
+<div class="grid-bg"></div>
+<div class="grain"></div>
+
+<nav>
+  <div class="inner">
+    <div class="logo">
+      <img src="../icon.ico" width="48" height="48" style="border-radius:14px;display:block;" alt="Screen Writer">
+      Screen Writer
+    </div>
+    <div class="nav-actions">
+      <a class="lang" href="../en/">EN</a>
+      <a class="cta" href="#download">حمّل مجاناً</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="badge reveal">
+      <span class="dot">✦</span>
+      <span>ويندوز ≥ 10</span>
+    </div>
+    <h1 class="reveal">
+      شاشتك،<br>
+      <em>لوحتك</em>
+    </h1>
+    <p class="lede reveal">طبقة شفافة تتحوّل بلمسة مفتاح إلى سبورة للرسم والتعليق. ارسم فوق أي تطبيق أثناء اجتماعات Zoom وTeams وMeet — بصمت، وبدون إيقاف أي شيء.</p>
+    <div class="hero-ctas reveal">
+      <a class="btn-primary" href="#download">حمّل مجاناً ↓</a>
+      <a class="btn-ghost" href="#features">استكشف الميزات</a>
+    </div>
+  </div>
+
+  <div class="preview-wrap reveal">
+    <div class="preview">
+      <div class="mock-toolbar">
+        <span class="on">رسم</span>
+        <span class="sep"></span>
+        <span class="swatch" style="background:#E63946"></span>
+        <span class="swatch" style="background:#F4A261"></span>
+        <span class="swatch" style="background:#FFD166"></span>
+        <span class="swatch" style="background:#06D6A0"></span>
+        <span class="swatch" style="background:#118AB2"></span>
+        <span class="swatch" style="background:#8338EC"></span>
+        <span class="swatch" style="background:#FFFFFF"></span>
+        <span class="swatch" style="background:#111"></span>
+        <span class="sep"></span>
+        <span class="ico">✏</span>
+        <span class="sep"></span>
+        <span class="ico">🖊</span>
+        <span class="ico">╱</span>
+        <span class="ico">▭</span>
+        <span class="ico">⬭</span>
+        <span class="ico">T</span>
+        <span class="ico">⌫</span>
+        <span class="sep"></span>
+        <span class="ico">↩</span>
+        <span class="ico">↪</span>
+        <span class="ico">🗑</span>
+      </div>
+      <div class="canvas-area">
+        <svg viewBox="0 0 900 320" preserveAspectRatio="none">
+          <path d="M 80 220 Q 200 80, 320 180 T 560 160 T 780 200" fill="none" stroke="#a78bfa" stroke-width="4" stroke-linecap="round" stroke-dasharray="1500" stroke-dashoffset="1500">
+            <animate attributeName="stroke-dashoffset" from="1500" to="0" dur="2.5s" begin="0.5s" fill="freeze"/>
+          </path>
+          <circle cx="400" cy="150" r="70" fill="none" stroke="#5eead4" stroke-width="3" stroke-dasharray="440" stroke-dashoffset="440">
+            <animate attributeName="stroke-dashoffset" from="440" to="0" dur="2s" begin="1.2s" fill="freeze"/>
+          </circle>
+          <rect x="600" y="80" width="160" height="100" rx="8" fill="none" stroke="#f9a8d4" stroke-width="3" stroke-dasharray="540" stroke-dashoffset="540">
+            <animate attributeName="stroke-dashoffset" from="540" to="0" dur="1.8s" begin="1.8s" fill="freeze"/>
+          </rect>
+          <line x1="60" y1="270" x2="820" y2="270" stroke="#fbbf24" stroke-width="3" stroke-linecap="round" stroke-dasharray="760" stroke-dashoffset="760">
+            <animate attributeName="stroke-dashoffset" from="760" to="0" dur="1.5s" begin="2.2s" fill="freeze"/>
+          </line>
+        </svg>
+        <div class="word w1">هنا الفكرة</div>
+        <div class="word w2">← مهم</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">الميزات · FEATURES</span>
+      <h2>كل ما تحتاجه<br>للشرح <em>بوضوح</em></h2>
+    </div>
+    <div class="bento">
+      <div class="card feature-hero reveal">
+        <div>
+          <div class="glyph">🎨</div>
+          <h3>8 ألوان و ٦ أدوات</h3>
+          <p>رسم حر، خط مستقيم، مستطيل، دائرة، نص، ممحاة — مع لوحة ألوان متناسقة وحجم قلم متغيّر من ٢ إلى ٣٠ بكسل.</p>
+        </div>
+        <div class="colors">
+          <span style="background:#E63946"></span>
+          <span style="background:#F4A261"></span>
+          <span style="background:#FFD166"></span>
+          <span style="background:#06D6A0"></span>
+          <span style="background:#118AB2"></span>
+          <span style="background:#8338EC"></span>
+          <span style="background:#fff"></span>
+          <span style="background:#222"></span>
+        </div>
+      </div>
+      <div class="card span-3 reveal">
+        <div class="glyph">🪟</div>
+        <h3>طبقة شفافة فوق كل شيء</h3>
+        <p>يرسم فوق أي تطبيق دون تعطيله. click-through عند إيقاف الرسم.</p>
+      </div>
+      <div class="card span-3 reveal">
+        <div class="glyph">📺</div>
+        <h3>مرئيّ في مشاركة الشاشة</h3>
+        <p>Zoom، Teams، Google Meet، OBS. يظهر تلقائياً، بدون إعدادات.</p>
+      </div>
+      <div class="card span-2 reveal">
+        <div class="glyph">↩</div>
+        <h3>تراجع كامل</h3>
+        <p>لكل خطوة، حتى مسح الكل.</p>
+      </div>
+      <div class="card span-2 reveal">
+        <div class="glyph">🎯</div>
+        <h3>شريط عائم ذكي</h3>
+        <p>ينزلق ويختفي تلقائياً من أعلى يسار الشاشة.</p>
+      </div>
+      <div class="card span-2 reveal">
+        <div class="glyph">🔔</div>
+        <h3>System Tray</h3>
+        <p>يعمل بصمت في الخلفية.</p>
+      </div>
+      <div class="card span-3 reveal">
+        <div class="glyph">⌨</div>
+        <h3>اختصارات عالميّة</h3>
+        <p>تعمل من أي تطبيق. لا حاجة لتفعيل نافذة Screen Writer أولاً.</p>
+      </div>
+      <div class="card span-3 reveal">
+        <div class="glyph">🚫</div>
+        <h3>لا يسرق التركيز</h3>
+        <p>تطبيقاتك تبقى نشطة. الرسم لا يُعطِّل أي شيء.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">اختصارات · HOTKEYS</span>
+      <h2>مفاتيح <em>عالميّة</em></h2>
+    </div>
+    <div class="keys-wrap">
+      <div class="key-card reveal">
+        <span class="desc">تفعيل / إيقاف وضع الرسم</span>
+        <div class="combo">
+          <span class="kbd">Ctrl</span>
+          <span class="kbd">Alt</span>
+          <span class="kbd">D</span>
+        </div>
+      </div>
+      <div class="key-card reveal">
+        <span class="desc">مسح جميع الرسومات</span>
+        <div class="combo">
+          <span class="kbd">Ctrl</span>
+          <span class="kbd">Alt</span>
+          <span class="kbd">C</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="downloads" id="download">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">التحميل · DOWNLOAD</span>
+      <h2>ابدأ <em>الآن</em></h2>
+    </div>
+    <div class="dl-grid">
+      <div class="dl-card reveal">
+        <span class="tag">ويندوز ≥ 10</span>
+        <h3>Screen<br><em>Writer</em></h3>
+        <p>ثبّت وشغّل مباشرةً — بدون أي متطلبات إضافية.</p>
+        <a class="dl-btn" href="../Setup_ScreenWriter.exe" download>تحميل مجاني</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="dev-section">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">المطوّر · DEVELOPER</span>
+    </div>
+    <div class="dev-card reveal">
+      <div class="dev-avatar">👨‍💻</div>
+      <div class="dev-label">Developer</div>
+      <div class="dev-name">ناصر الماضي</div>
+      <div class="dev-tagline">مطوّر تطبيقات ومواقع ويب</div>
+      <div class="dev-divider"></div>
+      <a class="email-btn" href="mailto:nasmn77@gmail.com">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <polyline points="2,4 12,13 22,4"/>
+        </svg>
+        nasmn77@gmail.com
+      </a>
+      <a class="github-btn" href="https://github.com/nasmn77/ScreenWriter" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.268 2.75 1.026A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.026 2.747-1.026.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+        </svg>
+        nasmn77/ScreenWriter
+      </a>
+      <a class="opensource-badge" href="https://github.com/nasmn77/ScreenWriter" target="_blank" rel="noopener">
+        ⭐ مفتوح المصدر · Open Source
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="brand">Screen Writer</div>
+  <div class="meta">© 2026</div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('in'), i * 70);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

@@ -68,25 +68,27 @@
 
             <!-- تفعيل/إيقاف -->
             <Button x:Name="BtnToggleMode" Style="{StaticResource ToolBtn}" Padding="8,0"
-                    Click="BtnToggleMode_Click" ToolTip="تفعيل / إيقاف الرسم  (Ctrl+Alt+D)">
+                    Click="BtnToggleMode_Click"
+                    ToolTip="{DynamicResource Str_ToggleMode}">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Ellipse x:Name="ModeIndicator" Width="8" Height="8" Fill="#555555" Margin="0,0,5,0"/>
-                    <TextBlock x:Name="ModeText" Text="رسم" FontSize="12"
-                               Foreground="#CCCCCC" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="ModeText"
+                               Text="{DynamicResource Str_ModeInactive}"
+                               FontSize="12" Foreground="#CCCCCC" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
 
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 
             <!-- ألوان -->
-            <Button Background="#E63946" Style="{StaticResource ColorBtn}" Tag="#E63946" Click="ColorBtn_Click" ToolTip="أحمر"/>
-            <Button Background="#F4A261" Style="{StaticResource ColorBtn}" Tag="#F4A261" Click="ColorBtn_Click" ToolTip="برتقالي"/>
-            <Button Background="#FFD166" Style="{StaticResource ColorBtn}" Tag="#FFD166" Click="ColorBtn_Click" ToolTip="أصفر"/>
-            <Button Background="#06D6A0" Style="{StaticResource ColorBtn}" Tag="#06D6A0" Click="ColorBtn_Click" ToolTip="أخضر"/>
-            <Button Background="#118AB2" Style="{StaticResource ColorBtn}" Tag="#118AB2" Click="ColorBtn_Click" ToolTip="أزرق"/>
-            <Button Background="#8338EC" Style="{StaticResource ColorBtn}" Tag="#8338EC" Click="ColorBtn_Click" ToolTip="بنفسجي"/>
-            <Button Background="#FFFFFF" Style="{StaticResource ColorBtn}" Tag="#FFFFFF" Click="ColorBtn_Click" ToolTip="أبيض"/>
-            <Button Background="#111111" Style="{StaticResource ColorBtn}" Tag="#111111" Click="ColorBtn_Click" ToolTip="أسود"/>
+            <Button Background="#E63946" Style="{StaticResource ColorBtn}" Tag="#E63946" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Red}"/>
+            <Button Background="#F4A261" Style="{StaticResource ColorBtn}" Tag="#F4A261" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Orange}"/>
+            <Button Background="#FFD166" Style="{StaticResource ColorBtn}" Tag="#FFD166" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Yellow}"/>
+            <Button Background="#06D6A0" Style="{StaticResource ColorBtn}" Tag="#06D6A0" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Green}"/>
+            <Button Background="#118AB2" Style="{StaticResource ColorBtn}" Tag="#118AB2" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Blue}"/>
+            <Button Background="#8338EC" Style="{StaticResource ColorBtn}" Tag="#8338EC" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Purple}"/>
+            <Button Background="#FFFFFF" Style="{StaticResource ColorBtn}" Tag="#FFFFFF" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_White}"/>
+            <Button Background="#111111" Style="{StaticResource ColorBtn}" Tag="#111111" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Black}"/>
 
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 
@@ -99,29 +101,37 @@
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 
             <!-- أدوات الرسم -->
-            <Button x:Name="BtnPen"     Content="🖊"  Style="{StaticResource ToolBtn}" Click="BtnPen_Click"     ToolTip="رسم حر"/>
-            <Button x:Name="BtnLine"    Content="╱"   Style="{StaticResource ToolBtn}" Click="BtnLine_Click"    ToolTip="خط مستقيم"/>
-            <Button x:Name="BtnRect"    Content="▭"   Style="{StaticResource ToolBtn}" Click="BtnRect_Click"    ToolTip="مستطيل"/>
-            <Button x:Name="BtnEllipse" Content="⬭"   Style="{StaticResource ToolBtn}" Click="BtnEllipse_Click" ToolTip="دائرة / بيضاوي"/>
-            <Button x:Name="BtnText"    Content="T"   Style="{StaticResource ToolBtn}" Click="BtnText_Click"    ToolTip="كتابة نص" FontWeight="Bold"/>
-            <Button x:Name="BtnEraser"  Content="⌫"   Style="{StaticResource ToolBtn}" Click="BtnEraser_Click"  ToolTip="ممحاة"/>
+            <Button x:Name="BtnPen"     Content="🖊"  Style="{StaticResource ToolBtn}" Click="BtnPen_Click"     ToolTip="{DynamicResource Str_ToolPen}"/>
+            <Button x:Name="BtnLine"    Content="╱"   Style="{StaticResource ToolBtn}" Click="BtnLine_Click"    ToolTip="{DynamicResource Str_ToolLine}"/>
+            <Button x:Name="BtnRect"    Content="▭"   Style="{StaticResource ToolBtn}" Click="BtnRect_Click"    ToolTip="{DynamicResource Str_ToolRect}"/>
+            <Button x:Name="BtnEllipse" Content="⬭"   Style="{StaticResource ToolBtn}" Click="BtnEllipse_Click" ToolTip="{DynamicResource Str_ToolEllipse}"/>
+            <Button x:Name="BtnText"    Content="T"   Style="{StaticResource ToolBtn}" Click="BtnText_Click"    ToolTip="{DynamicResource Str_ToolText}" FontWeight="Bold"/>
+            <Button x:Name="BtnEraser"  Content="⌫"   Style="{StaticResource ToolBtn}" Click="BtnEraser_Click"  ToolTip="{DynamicResource Str_ToolEraser}"/>
 
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 
             <!-- تراجع / إعادة / مسح -->
-            <Button Content="↩" Style="{StaticResource ToolBtn}" Click="BtnUndo_Click"  ToolTip="تراجع"/>
-            <Button Content="↪" Style="{StaticResource ToolBtn}" Click="BtnRedo_Click"  ToolTip="إعادة"/>
-            <Button Content="🗑" Style="{StaticResource ToolBtn}" Click="BtnClear_Click" ToolTip="مسح الكل"/>
+            <Button Content="↩" Style="{StaticResource ToolBtn}" Click="BtnUndo_Click"  ToolTip="{DynamicResource Str_Undo}"/>
+            <Button Content="↪" Style="{StaticResource ToolBtn}" Click="BtnRedo_Click"  ToolTip="{DynamicResource Str_Redo}"/>
+            <Button Content="🗑" Style="{StaticResource ToolBtn}" Click="BtnClear_Click" ToolTip="{DynamicResource Str_ClearAll}"/>
 
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 
             <!-- عن البرنامج -->
             <Button Content="ⓘ" Style="{StaticResource ToolBtn}" Click="BtnAbout_Click"
-                    Foreground="#06D6A0" ToolTip="عن البرنامج" Padding="6,0"/>
+                    Foreground="#06D6A0" ToolTip="{DynamicResource Str_About}" Padding="6,0"/>
+
+            <!-- تبديل اللغة -->
+            <Button x:Name="BtnLang"
+                    Content="{DynamicResource Str_LangToggle}"
+                    Style="{StaticResource ToolBtn}"
+                    Click="BtnLang_Click"
+                    Foreground="#FFD166" Padding="6,0"
+                    FontSize="11" FontWeight="Bold"/>
 
             <!-- إغلاق -->
             <Button Content="✕" Style="{StaticResource ToolBtn}" Click="BtnClose_Click"
-                    Foreground="#FF6B6B" ToolTip="إغلاق التطبيق" Padding="6,0"/>
+                    Foreground="#FF6B6B" ToolTip="{DynamicResource Str_Close}" Padding="6,0"/>
 
         </StackPanel>
     </Border>

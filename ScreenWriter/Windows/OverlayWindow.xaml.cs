@@ -15,6 +15,7 @@ using Brushes        = System.Windows.Media.Brushes;
 using TextBox        = System.Windows.Controls.TextBox;
 
 using ScreenWriter.Models;
+using ScreenWriter.Services;
 
 namespace ScreenWriter.Windows;
 
@@ -470,9 +471,10 @@ public partial class OverlayWindow : Window
         bool wasDrawing = _drawingMode;
         if (wasDrawing) ApplyClickThrough(true);
 
+        var svc    = LocalizationService.Instance;
         var result = MessageBox.Show(
-            "هل تريد مسح جميع الرسومات؟",
-            "مسح الكل",
+            svc.Get("Str_ClearConfirmMsg"),
+            svc.Get("Str_ClearConfirmTitle"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question,
             MessageBoxResult.No);
