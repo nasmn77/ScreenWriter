@@ -1,5 +1,7 @@
 # ScreenWriter
 
+> 🇬🇧 **English description is available below** — [Jump to English](#english)
+
 تطبيق Windows للرسم والتوضيح فوق الشاشة بشكل كامل، مصمم للشرح أثناء الاجتماعات الافتراضية ومشاركة الشاشة. يدعم اللغتين العربية والإنجليزية مع تبديل فوري بدون إعادة تشغيل.
 
 > Built with C# · WPF · .NET 10 · Windows
@@ -177,6 +179,8 @@ MIT License — حر الاستخدام والتعديل والتوزيع.
 ---
 
 ---
+
+<a name="english"></a>
 
 # ScreenWriter
 
