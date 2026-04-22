@@ -121,19 +121,25 @@
   .kbd { font-family: 'Cairo', sans-serif; font-weight: 500; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 10px 16px; border-radius: 10px; font-size: 14px; color: var(--text); box-shadow: 0 2px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
 
   .downloads { padding-bottom: 120px; }
-  .dl-grid { display: flex; justify-content: center; margin-top: 60px; }
-  .dl-grid .dl-card { max-width: 420px; width: 100%; }
-  .dl-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px) saturate(140%); border: 1px solid var(--line); border-radius: 24px; padding: 36px 30px; position: relative; transition: all .4s cubic-bezier(.2,.7,.2,1); overflow: hidden; }
+  .dl-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 420px)); justify-content: center; gap: 24px; margin-top: 60px; }
+  .dl-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px) saturate(140%); border: 1px solid var(--line); border-radius: 24px; padding: 36px 30px; position: relative; transition: all .4s cubic-bezier(.2,.7,.2,1); overflow: hidden; display: flex; flex-direction: column; }
   .dl-card:hover { transform: translateY(-8px); box-shadow: 0 30px 60px rgba(0,0,0,0.4); }
-  .dl-card:nth-child(1) { background: linear-gradient(135deg, rgba(94,234,212,0.12), transparent 50%), rgba(255,255,255,0.04); border-color: rgba(94,234,212,0.3); }
-  .dl-card:nth-child(1):hover { box-shadow: 0 30px 60px rgba(94,234,212,0.15); }
-  .dl-card .tag { display: inline-block; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; margin-bottom: 24px; color: var(--mint); background: rgba(94,234,212,0.12); border: 1px solid rgba(94,234,212,0.3); }
+  .dl-card.github { background: linear-gradient(135deg, rgba(94,234,212,0.12), transparent 50%), rgba(255,255,255,0.04); border-color: rgba(94,234,212,0.3); }
+  .dl-card.github:hover { box-shadow: 0 30px 60px rgba(94,234,212,0.15); }
+  .dl-card.store { background: linear-gradient(135deg, rgba(103,232,249,0.12), transparent 50%), rgba(255,255,255,0.04); border-color: rgba(103,232,249,0.3); }
+  .dl-card.store:hover { box-shadow: 0 30px 60px rgba(103,232,249,0.15); }
+  .dl-card .tag { display: inline-block; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; margin-bottom: 24px; align-self: flex-start; }
+  .dl-card.github .tag { color: var(--mint); background: rgba(94,234,212,0.12); border: 1px solid rgba(94,234,212,0.3); }
+  .dl-card.store .tag { color: var(--cyan); background: rgba(103,232,249,0.12); border: 1px solid rgba(103,232,249,0.3); }
   .dl-card h3 { font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 32px; line-height: 1.2; margin-bottom: 6px; letter-spacing: -0.3px; }
   .dl-card h3 em { font-style: normal; font-weight: 500; opacity: 0.85; }
   .dl-card p { color: var(--text-dim); font-size: 15px; line-height: 1.75; min-height: 60px; margin-bottom: 22px; }
-  .dl-btn { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 14px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 15px; color: var(--bg-1); transition: all .3s ease; background: linear-gradient(135deg, var(--mint), var(--cyan)); box-shadow: 0 10px 30px rgba(94,234,212,0.35); }
+  .dl-btn { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 14px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 15px; color: var(--bg-1); transition: all .3s ease; margin-top: auto; }
   .dl-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
-  .dl-btn::after { content: '↓'; font-size: 18px; }
+  .dl-card.github .dl-btn { background: linear-gradient(135deg, var(--mint), var(--cyan)); box-shadow: 0 10px 30px rgba(94,234,212,0.35); }
+  .dl-card.github .dl-btn::after { content: '↓'; font-size: 18px; }
+  .dl-card.store .dl-btn { background: linear-gradient(135deg, var(--cyan), #38bdf8); box-shadow: 0 10px 30px rgba(103,232,249,0.35); }
+  .dl-card.store .dl-btn svg { width: 20px; height: 20px; }
 
   footer { padding: 60px 30px 40px; border-top: 1px solid var(--line); text-align: center; position: relative; z-index: 5; background: rgba(11,4,32,0.6); backdrop-filter: blur(20px); }
   footer .brand { font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 32px; margin-bottom: 14px; background: linear-gradient(135deg, var(--violet), var(--cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
@@ -160,7 +166,7 @@
   @media (max-width: 900px) {
     .bento { grid-template-columns: repeat(2, 1fr); }
     .card.span-3, .card.span-2, .card.span-4, .card.feature-hero { grid-column: span 2; grid-row: auto; }
-    .dl-grid .dl-card { max-width: 100%; }
+    .dl-grid { grid-template-columns: 1fr; max-width: 420px; margin-left: auto; margin-right: auto; }
     nav .inner { padding: 10px 14px 10px 6px; }
     nav .logo { font-size: 16px; }
     .hero { padding: 60px 0 80px; }
@@ -444,11 +450,22 @@
       <h2>Get Started <em>Now</em></h2>
     </div>
     <div class="dl-grid">
-      <div class="dl-card reveal">
-        <span class="tag">Windows ≥ 10</span>
+      <div class="dl-card github reveal">
+        <span class="tag">GitHub · Direct</span>
         <h3>Screen<br><em>Writer</em></h3>
         <p>Install and run instantly — no additional requirements.</p>
         <a class="dl-btn" href="https://github.com/nasmn77/ScreenWriter/releases/download/v1.0.0/Setup_ScreenWriter.exe" download>Free Download</a>
+      </div>
+      <div class="dl-card store reveal">
+        <span class="tag">Microsoft Store</span>
+        <h3>Screen<br><em>Writer</em></h3>
+        <p>Automatic updates and secure install directly from Microsoft Store.</p>
+        <a class="dl-btn" href="https://apps.microsoft.com/detail/9nf25dzqxlct" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M11.4 11.4H2V2h9.4v9.4zM22 11.4h-9.4V2H22v9.4zM11.4 22H2v-9.4h9.4V22zM22 22h-9.4v-9.4H22V22z"/>
+          </svg>
+          Get from Microsoft Store
+        </a>
       </div>
     </div>
   </div>

@@ -13,9 +13,7 @@ public sealed class UpdateService
 {
     public static UpdateService Instance { get; } = new();
 
-    // TODO: عند نشر التطبيق في Microsoft Store، حدّث هذه القيمة بالـ Product ID الحقيقي
-    // (يظهر في apps.microsoft.com/detail/XXXXXXXXXXXX)
-    private const string StoreProductId = "9NBLGGH4XXXXXX";
+    private const string StoreProductId = "9NF25DZQXLCT";
 
     private const string LatestReleaseUrl =
         "https://api.github.com/repos/nasmn77/ScreenWriter/releases/latest";
