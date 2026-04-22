@@ -101,31 +101,55 @@
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 
             <!-- أدوات الرسم -->
-            <Button x:Name="BtnPen"     Content="🖊"  Style="{StaticResource ToolBtn}" Click="BtnPen_Click"     ToolTip="{DynamicResource Str_ToolPen}"/>
-            <Button x:Name="BtnArrow"   Content="⇒"   Style="{StaticResource ToolBtn}" Click="BtnArrow_Click"   ToolTip="{DynamicResource Str_ToolArrow}"/>
-            <Button x:Name="BtnLine"    Content="╱"   Style="{StaticResource ToolBtn}" Click="BtnLine_Click"    ToolTip="{DynamicResource Str_ToolLine}"/>
-            <Button x:Name="BtnRect"    Content="▭"   Style="{StaticResource ToolBtn}" Click="BtnRect_Click"    ToolTip="{DynamicResource Str_ToolRect}"/>
-            <Button x:Name="BtnEllipse" Content="⬭"   Style="{StaticResource ToolBtn}" Click="BtnEllipse_Click" ToolTip="{DynamicResource Str_ToolEllipse}"/>
-            <Button x:Name="BtnText"    Content="T"   Style="{StaticResource ToolBtn}" Click="BtnText_Click"    ToolTip="{DynamicResource Str_ToolText}" FontWeight="Bold"/>
-            <Button x:Name="BtnEraser"  Content="⌫"   Style="{StaticResource ToolBtn}" Click="BtnEraser_Click"  ToolTip="{DynamicResource Str_ToolEraser}"/>
+            <Button x:Name="BtnPen"     Style="{StaticResource ToolBtn}" Click="BtnPen_Click"     ToolTip="{DynamicResource Str_ToolPen}">
+                <Image Source="/Assets/Icons/pen.png"     Width="18" Height="18"/>
+            </Button>
+            <Button x:Name="BtnArrow"   Style="{StaticResource ToolBtn}" Click="BtnArrow_Click"   ToolTip="{DynamicResource Str_ToolArrow}">
+                <Image Source="/Assets/Icons/arrow.png"   Width="18" Height="18"/>
+            </Button>
+            <Button x:Name="BtnLine"    Style="{StaticResource ToolBtn}" Click="BtnLine_Click"    ToolTip="{DynamicResource Str_ToolLine}">
+                <Image Source="/Assets/Icons/line.png"    Width="18" Height="18"/>
+            </Button>
+            <Button x:Name="BtnRect"    Style="{StaticResource ToolBtn}" Click="BtnRect_Click"    ToolTip="{DynamicResource Str_ToolRect}">
+                <Image Source="/Assets/Icons/rect.png"    Width="18" Height="18"/>
+            </Button>
+            <Button x:Name="BtnEllipse" Style="{StaticResource ToolBtn}" Click="BtnEllipse_Click" ToolTip="{DynamicResource Str_ToolEllipse}">
+                <Image Source="/Assets/Icons/ellipse.png" Width="18" Height="18"/>
+            </Button>
+            <Button x:Name="BtnText"    Style="{StaticResource ToolBtn}" Click="BtnText_Click"    ToolTip="{DynamicResource Str_ToolText}">
+                <Image Source="/Assets/Icons/text.png"    Width="18" Height="18"/>
+            </Button>
+            <Button x:Name="BtnEraser"  Style="{StaticResource ToolBtn}" Click="BtnEraser_Click"  ToolTip="{DynamicResource Str_ToolEraser}">
+                <Image Source="/Assets/Icons/eraser.png"  Width="18" Height="18"/>
+            </Button>
 
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 
             <!-- تراجع / إعادة / مسح -->
-            <Button Content="↩" Style="{StaticResource ToolBtn}" Click="BtnUndo_Click"  ToolTip="{DynamicResource Str_Undo}"/>
-            <Button Content="↪" Style="{StaticResource ToolBtn}" Click="BtnRedo_Click"  ToolTip="{DynamicResource Str_Redo}"/>
-            <Button Content="🗑" Style="{StaticResource ToolBtn}" Click="BtnClear_Click" ToolTip="{DynamicResource Str_ClearAll}"/>
+            <Button Style="{StaticResource ToolBtn}" Click="BtnUndo_Click"  ToolTip="{DynamicResource Str_Undo}">
+                <Image Source="/Assets/Icons/undo.png"  Width="18" Height="18"/>
+            </Button>
+            <Button Style="{StaticResource ToolBtn}" Click="BtnRedo_Click"  ToolTip="{DynamicResource Str_Redo}">
+                <Image Source="/Assets/Icons/redo.png"  Width="18" Height="18"/>
+            </Button>
+            <Button Style="{StaticResource ToolBtn}" Click="BtnClear_Click" ToolTip="{DynamicResource Str_ClearAll}">
+                <Image Source="/Assets/Icons/trash.png" Width="18" Height="18"/>
+            </Button>
 
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 
             <!-- عن البرنامج -->
-            <Button Content="ⓘ" Style="{StaticResource ToolBtn}" Click="BtnAbout_Click"
-                    Foreground="#06D6A0" ToolTip="{DynamicResource Str_About}" Padding="6,0"/>
+            <Button Style="{StaticResource ToolBtn}" Click="BtnAbout_Click"
+                    ToolTip="{DynamicResource Str_About}" Padding="6,0">
+                <Image Source="/Assets/Icons/info.png" Width="18" Height="18"/>
+            </Button>
 
             <!-- تبديل موضع الشريط -->
-            <Button x:Name="BtnPosition" Content="⇌" Style="{StaticResource ToolBtn}"
-                    Click="BtnPosition_Click" Foreground="#888888"
-                    ToolTip="{DynamicResource Str_TogglePosition}" Padding="4,0"/>
+            <Button x:Name="BtnPosition" Style="{StaticResource ToolBtn}"
+                    Click="BtnPosition_Click"
+                    ToolTip="{DynamicResource Str_TogglePosition}" Padding="4,0">
+                <Image Source="/Assets/Icons/swap.png" Width="18" Height="18"/>
+            </Button>
 
             <!-- تبديل اللغة -->
             <Button x:Name="BtnLang"

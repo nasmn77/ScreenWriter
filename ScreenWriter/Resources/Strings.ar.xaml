@@ -39,6 +39,8 @@
     <!-- Dialogs -->
     <sys:String x:Key="Str_ClearConfirmTitle">مسح الكل</sys:String>
     <sys:String x:Key="Str_ClearConfirmMsg">هل تريد مسح جميع الرسومات؟</sys:String>
+    <sys:String x:Key="Str_CloseConfirmTitle">إغلاق التطبيق</sys:String>
+    <sys:String x:Key="Str_CloseConfirmMsg">سيتم فقدان جميع الرسومات. هل تريد الإغلاق؟</sys:String>
 
     <!-- Tray -->
     <sys:String x:Key="Str_TrayToggleDraw">تفعيل / إيقاف الرسم  (Ctrl+Alt+D)</sys:String>

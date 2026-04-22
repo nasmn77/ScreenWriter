@@ -3,11 +3,13 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Color          = System.Windows.Media.Color;
 using Brushes        = System.Windows.Media.Brushes;
 using ColorConverter = System.Windows.Media.ColorConverter;
 using Button         = System.Windows.Controls.Button;
+using Image          = System.Windows.Controls.Image;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 using ScreenWriter.Models;
@@ -51,6 +53,10 @@ public partial class ToolbarWindow : Window
     private static readonly SolidColorBrush ActiveBrush   = new(Color.FromRgb(6, 214, 160));
     private static readonly SolidColorBrush InactiveBrush = new(Color.FromRgb(0xCC, 0xCC, 0xCC));
 
+    private static readonly Dictionary<string, BitmapImage> _iconCache = [];
+
+    private Dictionary<Button, string> _btnIcons = [];
+
     private Button? _activeToolBtn;
     private bool    _eraserActive;
     private bool    _currentModeIsDrawing;
@@ -67,6 +73,16 @@ public partial class ToolbarWindow : Window
 
         Loaded += (_, _) =>
         {
+            _btnIcons = new()
+            {
+                { BtnPen,     "pen"     },
+                { BtnArrow,   "arrow"   },
+                { BtnLine,    "line"    },
+                { BtnRect,    "rect"    },
+                { BtnEllipse, "ellipse" },
+                { BtnText,    "text"    },
+                { BtnEraser,  "eraser"  },
+            };
             _hiddenTop = -(ActualHeight - TriggerHeight);
             SetActiveTool(DrawingTool.Pen, BtnPen);
             BringToTopmost();
@@ -184,8 +200,8 @@ public partial class ToolbarWindow : Window
         _eraserActive = !_eraserActive;
         if (_eraserActive)
         {
-            if (_activeToolBtn is not null) _activeToolBtn.Foreground = InactiveBrush;
-            HighlightTool(BtnEraser, Brushes.Orange);
+            if (_activeToolBtn is not null) RestoreIcon(_activeToolBtn);
+            SetBtnIcon(BtnEraser, "eraser-red");
             _activeToolBtn = BtnEraser;
             ToolChanged?.Invoke(DrawingTool.Eraser);
             EraserToggled?.Invoke(true);
@@ -199,17 +215,35 @@ public partial class ToolbarWindow : Window
 
     private void SetActiveTool(DrawingTool tool, Button btn)
     {
-        _eraserActive        = false;
-        BtnEraser.Foreground = InactiveBrush;
-
-        if (_activeToolBtn is not null) _activeToolBtn.Foreground = InactiveBrush;
+        _eraserActive = false;
+        if (_activeToolBtn is not null) RestoreIcon(_activeToolBtn);
         _activeToolBtn = btn;
-        HighlightTool(btn, ActiveBrush);
+        if (_btnIcons.TryGetValue(btn, out var icon))
+            SetBtnIcon(btn, icon + "-red");
         ToolChanged?.Invoke(tool);
     }
 
-    private static void HighlightTool(Button btn, System.Windows.Media.Brush brush)
-        => btn.Foreground = brush;
+    private void RestoreIcon(Button btn)
+    {
+        if (_btnIcons.TryGetValue(btn, out var icon))
+            SetBtnIcon(btn, icon);
+    }
+
+    private static void SetBtnIcon(Button btn, string iconName)
+    {
+        if (btn.Content is Image img)
+            img.Source = GetIcon(iconName);
+    }
+
+    private static BitmapImage GetIcon(string name)
+    {
+        if (!_iconCache.TryGetValue(name, out var img))
+        {
+            img = new BitmapImage(new Uri($"pack://application:,,,/Assets/Icons/{name}.png"));
+            _iconCache[name] = img;
+        }
+        return img;
+    }
 
     // ── Slider ────────────────────────────────────────────────────────────────
     private void SizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -219,7 +253,17 @@ public partial class ToolbarWindow : Window
     private void BtnUndo_Click    (object sender, RoutedEventArgs e) => UndoRequested?.Invoke();
     private void BtnRedo_Click    (object sender, RoutedEventArgs e) => RedoRequested?.Invoke();
     private void BtnClear_Click   (object sender, RoutedEventArgs e) => ClearRequested?.Invoke();
-    private void BtnClose_Click   (object sender, RoutedEventArgs e) => ExitRequested?.Invoke();
+    private void BtnClose_Click(object sender, RoutedEventArgs e)
+    {
+        var svc    = LocalizationService.Instance;
+        var result = System.Windows.MessageBox.Show(
+            svc.Get("Str_CloseConfirmMsg"),
+            svc.Get("Str_CloseConfirmTitle"),
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question,
+            MessageBoxResult.No);
+        if (result == MessageBoxResult.Yes) ExitRequested?.Invoke();
+    }
     private void BtnAbout_Click   (object sender, RoutedEventArgs e) => AboutRequested?.Invoke();
     private void BtnLang_Click    (object sender, RoutedEventArgs e) => LangToggleRequested?.Invoke();
     private void BtnPosition_Click(object sender, RoutedEventArgs e) => PositionToggleRequested?.Invoke();

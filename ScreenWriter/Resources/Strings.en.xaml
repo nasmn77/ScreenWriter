@@ -39,6 +39,8 @@
     <!-- Dialogs -->
     <sys:String x:Key="Str_ClearConfirmTitle">Clear All</sys:String>
     <sys:String x:Key="Str_ClearConfirmMsg">Clear all drawings?</sys:String>
+    <sys:String x:Key="Str_CloseConfirmTitle">Close</sys:String>
+    <sys:String x:Key="Str_CloseConfirmMsg">All drawings will be lost. Close anyway?</sys:String>
 
     <!-- Tray -->
     <sys:String x:Key="Str_TrayToggleDraw">Toggle Draw  (Ctrl+Alt+D)</sys:String>

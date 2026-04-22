@@ -22,6 +22,25 @@
 
   <ItemGroup>
     <Resource Include="Assets\icon.ico"/>
+    <Resource Include="Assets\Icons\pen.png"/>
+    <Resource Include="Assets\Icons\arrow.png"/>
+    <Resource Include="Assets\Icons\line.png"/>
+    <Resource Include="Assets\Icons\rect.png"/>
+    <Resource Include="Assets\Icons\ellipse.png"/>
+    <Resource Include="Assets\Icons\text.png"/>
+    <Resource Include="Assets\Icons\eraser.png"/>
+    <Resource Include="Assets\Icons\undo.png"/>
+    <Resource Include="Assets\Icons\redo.png"/>
+    <Resource Include="Assets\Icons\trash.png"/>
+    <Resource Include="Assets\Icons\info.png"/>
+    <Resource Include="Assets\Icons\swap.png"/>
+    <Resource Include="Assets\Icons\pen-red.png"/>
+    <Resource Include="Assets\Icons\arrow-red.png"/>
+    <Resource Include="Assets\Icons\line-red.png"/>
+    <Resource Include="Assets\Icons\rect-red.png"/>
+    <Resource Include="Assets\Icons\ellipse-red.png"/>
+    <Resource Include="Assets\Icons\text-red.png"/>
+    <Resource Include="Assets\Icons\eraser-red.png"/>
   </ItemGroup>
 
 </Project>
