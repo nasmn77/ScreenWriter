@@ -1,9 +1,9 @@
 ﻿#define MyAppName "Screen Writer"
-#define MyAppVersion "1.0.0"
+#define PublishDir "..\publish"
+#define MyAppVersion GetStringFileInfo(PublishDir + "\ScreenWriter.exe", "ProductVersion")
 #define MyAppPublisher "Naser Almadi"
 #define MyAppURL "https://docs.naseralmadi.cloud/apps/ar/"
 #define MyAppExeName "ScreenWriter.exe"
-#define PublishDir "..\publish"
 
 [Setup]
 AppId={{A3F2B1C4-7E5D-4F8A-9B2C-1D3E5F6A7B8C}
@@ -109,7 +109,7 @@ begin
 
   RbRepair         := TRadioButton.Create(AlreadyInstalledPage);
   RbRepair.Parent  := AlreadyInstalledPage.Surface;
-  RbRepair.Caption := 'Repair / Reinstall';
+  RbRepair.Caption := 'Update / Repair / Reinstall';
   RbRepair.Left    := 0;
   RbRepair.Top     := Lbl.Top + Lbl.Height + 20;
   RbRepair.Width   := AlreadyInstalledPage.SurfaceWidth;

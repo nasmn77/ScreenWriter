@@ -92,9 +92,9 @@
             </StackPanel>
 
             <!-- Version + author at bottom -->
-            <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Center"
+            <TextBlock x:Name="TxtVersionLine"
+                       VerticalAlignment="Bottom" HorizontalAlignment="Center"
                        Margin="0,0,0,14"
-                       Text="v1.0.0  ·  ناصر الماضي"
                        FontSize="11" Foreground="#374151"/>
         </Grid>
     </Border>

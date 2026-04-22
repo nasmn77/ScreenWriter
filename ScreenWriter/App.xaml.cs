@@ -116,6 +116,17 @@ public partial class App : System.Windows.Application
         catch { }
         _toolbar.RestoreInitialPenSize(SettingsService.Instance.LastPenSize);
         _toolbar.RestoreInitialTool(SettingsService.Instance.LastTool);
+
+        if (!UpdateService.IsPackagedApp)
+        {
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(3000);
+                var info = await UpdateService.Instance.CheckAsync(CancellationToken.None);
+                if (info != null)
+                    Dispatcher.Invoke(() => UpdateDialog.Show(info));
+            });
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)

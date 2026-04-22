@@ -239,7 +239,13 @@ public partial class ToolbarWindow : Window
     {
         if (!_iconCache.TryGetValue(name, out var img))
         {
-            img = new BitmapImage(new Uri($"pack://application:,,,/Assets/Icons/{name}.png"));
+            img = new BitmapImage();
+            img.BeginInit();
+            img.UriSource      = new Uri($"pack://application:,,,/Assets/Icons/{name}.png");
+            img.CacheOption    = BitmapCacheOption.OnLoad;
+            img.DecodePixelWidth = 36;
+            img.EndInit();
+            img.Freeze();
             _iconCache[name] = img;
         }
         return img;

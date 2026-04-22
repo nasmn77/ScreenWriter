@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using ScreenWriter.Services;
 
 namespace ScreenWriter.Windows;
 
@@ -10,6 +11,8 @@ public partial class SplashWindow : Window
     public SplashWindow()
     {
         InitializeComponent();
+        var author = LocalizationService.Instance.Get("Str_AuthorName");
+        TxtVersionLine.Text = $"v{UpdateService.CurrentVersion.ToString(3)}  ·  {author}";
         Loaded += OnLoaded;
     }
 

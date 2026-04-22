@@ -12,6 +12,7 @@ public partial class AboutWindow : Window
         InitializeComponent();
         ApplyFlowDirection();
         LocalizationService.Instance.LanguageChanged += ApplyFlowDirection;
+        TxtVersion.Text = $"v {UpdateService.CurrentVersion.ToString(3)}";
         Loaded += (_, _) => LoadIcon();
     }
 
@@ -42,4 +43,35 @@ public partial class AboutWindow : Window
     private void BtnClose_Click(object sender, RoutedEventArgs e) => Close();
 
     private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) => DragMove();
+
+    private async void BtnCheckUpdates_Click(object sender, RoutedEventArgs e)
+    {
+        if (UpdateService.IsPackagedApp)
+        {
+            UpdateService.Instance.OpenStoreListing();
+            return;
+        }
+
+        BtnCheckUpdates.IsEnabled = false;
+        TxtUpdateStatus.Text = LocalizationService.Instance.Get("Str_CheckingUpdates");
+
+        var info = await UpdateService.Instance.CheckAsync(CancellationToken.None);
+
+        BtnCheckUpdates.IsEnabled = true;
+
+        if (info != null)
+        {
+            TxtUpdateStatus.Text = "";
+            Close();
+            UpdateDialog.Show(info);
+        }
+        else if (UpdateService.Instance.LastCheckFailed)
+        {
+            TxtUpdateStatus.Text = LocalizationService.Instance.Get("Str_UpdateFailed");
+        }
+        else
+        {
+            TxtUpdateStatus.Text = LocalizationService.Instance.Get("Str_UpToDate");
+        }
+    }
 }

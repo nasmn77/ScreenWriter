@@ -60,4 +60,17 @@
     <sys:String x:Key="Str_AboutDescription">Draw and annotate on screen</sys:String>
     <sys:String x:Key="Str_AuthorName">Naser Almadi</sys:String>
 
+    <!-- Updates -->
+    <sys:String x:Key="Str_CheckForUpdates">Check for updates</sys:String>
+    <sys:String x:Key="Str_CheckingUpdates">Checking…</sys:String>
+    <sys:String x:Key="Str_UpToDate">You're on the latest version</sys:String>
+    <sys:String x:Key="Str_UpdateFailed">Couldn't check for updates</sys:String>
+    <sys:String x:Key="Str_UpdateAvailable">Update available</sys:String>
+    <sys:String x:Key="Str_CurrentVersion">Current version</sys:String>
+    <sys:String x:Key="Str_NewVersion">New version</sys:String>
+    <sys:String x:Key="Str_UpdateNow">Update now</sys:String>
+    <sys:String x:Key="Str_Later">Later</sys:String>
+    <sys:String x:Key="Str_Downloading">Downloading…</sys:String>
+    <sys:String x:Key="Str_Arrow">→</sys:String>
+
 </ResourceDictionary>

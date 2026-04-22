@@ -5,7 +5,7 @@
         AllowsTransparency="True"
         Background="Transparent"
         WindowStartupLocation="CenterScreen"
-        Width="380" Height="310"
+        Width="380" Height="390"
         ShowInTaskbar="False"
         ResizeMode="NoResize"
         Topmost="True"
@@ -82,7 +82,7 @@
                         Background="#0D06D6A0" CornerRadius="10"
                         BorderBrush="#3006D6A0" BorderThickness="1"
                         Padding="12,3">
-                    <TextBlock Text="v 1.0.0"
+                    <TextBlock x:Name="TxtVersion"
                                FontSize="12" Foreground="#06D6A0"
                                HorizontalAlignment="Center"/>
                 </Border>
@@ -103,10 +103,48 @@
                                FontSize="12"/>
                 </StackPanel>
 
+                <!-- Update section -->
+                <Rectangle Height="1" Fill="#14FFFFFF" Margin="0,14,0,12"/>
+
+                <Button x:Name="BtnCheckUpdates"
+                        Content="{DynamicResource Str_CheckForUpdates}"
+                        Click="BtnCheckUpdates_Click"
+                        HorizontalAlignment="Center"
+                        Cursor="Hand"
+                        Background="Transparent"
+                        Foreground="#06D6A0"
+                        FontSize="12" FontWeight="SemiBold"
+                        BorderThickness="1" BorderBrush="#3006D6A0"
+                        Padding="16,6">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#1A06D6A0"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <TextBlock x:Name="TxtUpdateStatus"
+                           FontSize="11" Foreground="#9CA3AF"
+                           HorizontalAlignment="Center" Margin="0,8,0,0"
+                           TextAlignment="Center"/>
+
                 <!-- Copyright -->
                 <TextBlock Text="Copyright © 2026 Naser Almadi"
                            FontSize="11" Foreground="#374151"
-                           HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                           HorizontalAlignment="Center" Margin="0,10,0,0"/>
             </StackPanel>
         </Grid>
     </Border>

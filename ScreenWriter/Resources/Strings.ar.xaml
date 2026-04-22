@@ -60,4 +60,17 @@
     <sys:String x:Key="Str_AboutDescription">تطبيق رسم وتوضيح فوق الشاشة</sys:String>
     <sys:String x:Key="Str_AuthorName">ناصر الماضي</sys:String>
 
+    <!-- Updates -->
+    <sys:String x:Key="Str_CheckForUpdates">التحقق من التحديثات</sys:String>
+    <sys:String x:Key="Str_CheckingUpdates">جارٍ التحقق…</sys:String>
+    <sys:String x:Key="Str_UpToDate">أنت على أحدث نسخة</sys:String>
+    <sys:String x:Key="Str_UpdateFailed">تعذّر التحقق من التحديثات</sys:String>
+    <sys:String x:Key="Str_UpdateAvailable">يتوفّر تحديث</sys:String>
+    <sys:String x:Key="Str_CurrentVersion">النسخة الحالية</sys:String>
+    <sys:String x:Key="Str_NewVersion">النسخة الجديدة</sys:String>
+    <sys:String x:Key="Str_UpdateNow">تحديث الآن</sys:String>
+    <sys:String x:Key="Str_Later">لاحقًا</sys:String>
+    <sys:String x:Key="Str_Downloading">جارٍ التنزيل…</sys:String>
+    <sys:String x:Key="Str_Arrow">←</sys:String>
+
 </ResourceDictionary>
