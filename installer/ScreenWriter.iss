@@ -13,7 +13,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\{#MyAppName}
+DefaultDirName={localappdata}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=..\installer_output
@@ -21,8 +21,7 @@ OutputBaseFilename=Setup_ScreenWriter
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
-PrivilegesRequired=admin
-PrivilegesRequiredOverridesAllowed=commandline dialog
+PrivilegesRequired=lowest
 ArchitecturesInstallIn64BitMode=x64compatible
 SetupIconFile=..\ScreenWriter\Assets\icon.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
@@ -71,8 +70,7 @@ var
   sVal: String;
 begin
   sVal := '';
-  if not RegQueryStringValue(HKCU, UninstallKey, 'UninstallString', sVal) then
-    RegQueryStringValue(HKLM, UninstallKey, 'UninstallString', sVal);
+  RegQueryStringValue(HKCU, UninstallKey, 'UninstallString', sVal);
   Result := sVal;
 end;
 
@@ -82,9 +80,7 @@ begin
   if CurUninstallStep = usPostUninstall then
   begin
     RegDeleteValue(HKCU, RunKey, '{#MyAppName}');
-    RegDeleteValue(HKLM, RunKey, '{#MyAppName}');
     RegDeleteKeyIncludingSubkeys(HKCU, UninstallKey);
-    RegDeleteKeyIncludingSubkeys(HKLM, UninstallKey);
   end;
 end;
 
@@ -150,8 +146,6 @@ begin
 
         // Save install location before uninstall
         RegQueryStringValue(HKCU, UninstallKey, 'InstallLocation', sAppDir);
-        if sAppDir = '' then
-          RegQueryStringValue(HKLM, UninstallKey, 'InstallLocation', sAppDir);
 
         // Stop the app if running
         Exec('taskkill.exe', '/F /IM {#MyAppExeName}', '', SW_HIDE,
@@ -167,9 +161,7 @@ begin
 
         // Clean up registry
         RegDeleteValue(HKCU, RunKey, '{#MyAppName}');
-        RegDeleteValue(HKLM, RunKey, '{#MyAppName}');
         RegDeleteKeyIncludingSubkeys(HKCU, UninstallKey);
-        RegDeleteKeyIncludingSubkeys(HKLM, UninstallKey);
 
         MsgBox('{#MyAppName} has been completely uninstalled.', mbInformation, MB_OK);
         ExitProcess(0);
