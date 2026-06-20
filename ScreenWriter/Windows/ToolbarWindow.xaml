@@ -123,6 +123,9 @@
             <Button x:Name="BtnText"    Style="{StaticResource ToolBtn}" Click="BtnText_Click"    ToolTip="{DynamicResource Str_ToolText}">
                 <Image Source="/Assets/Icons/text.png"    Width="18" Height="18"/>
             </Button>
+            <Button x:Name="BtnSelect"  Style="{StaticResource ToolBtn}" Click="BtnSelect_Click"  ToolTip="{DynamicResource Str_ToolSelect}">
+                <Image Source="/Assets/Icons/select.png"  Width="18" Height="18"/>
+            </Button>
             <Button x:Name="BtnEraser"  Style="{StaticResource ToolBtn}" Click="BtnEraser_Click"  ToolTip="{DynamicResource Str_ToolEraser}">
                 <Image Source="/Assets/Icons/eraser.png"  Width="18" Height="18"/>
             </Button>

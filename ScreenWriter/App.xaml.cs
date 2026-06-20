@@ -88,6 +88,11 @@ public partial class App : System.Windows.Application
                 SettingsService.Instance.SetTool(tool);
         };
         _toolbar.EraserToggled  += eraser => _overlay.SetEraser(eraser);
+        _overlay.SelectionThicknessChanged += thickness =>
+        {
+            if (thickness.HasValue)
+                _toolbar.RestoreInitialPenSize(thickness.Value);
+        };
         _toolbar.UndoRequested  += ()     => _overlay.Undo();
         _toolbar.RedoRequested  += ()     => _overlay.Redo();
         _toolbar.ClearRequested += ()     => _overlay.ConfirmedClearAll();

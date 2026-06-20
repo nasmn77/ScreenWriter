@@ -24,6 +24,7 @@
     <sys:String x:Key="Str_ToolRect">Rectangle</sys:String>
     <sys:String x:Key="Str_ToolEllipse">Circle / Ellipse</sys:String>
     <sys:String x:Key="Str_ToolText">Text</sys:String>
+    <sys:String x:Key="Str_ToolSelect">Select / Move</sys:String>
     <sys:String x:Key="Str_ToolEraser">Eraser</sys:String>
     <sys:String x:Key="Str_ToolArrow">Arrow</sys:String>
 

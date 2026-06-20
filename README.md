@@ -20,8 +20,11 @@
 - **مرئي في مشاركة الشاشة** — يظهر في Zoom وTeams وGoogle Meet وOBS
 - **دعم اللغتين** — عربي وإنجليزي مع تبديل فوري من شريط الأدوات
 - **أدوات رسم متعددة** — رسم حر، سهم، خط مستقيم، مستطيل، دائرة/بيضاوي، كتابة نص
+- **أداة التحديد** — تحديد أي كائن ونقله وتغيير حجمه، مع إمكانية تعديل النص بالنقر المزدوج
+- **تغيير لون وسماكة الكائن المحدد** — مباشرة من شريط الأدوات بعد التحديد
 - **8 ألوان** مع تحكم كامل في حجم القلم
-- **ممحاة** وتراجع/إعادة كاملين (يشملان مسح الكل)
+- **ممحاة** تمسح الكائن كاملاً بلمسة واحدة
+- **تراجع/إعادة** كاملين يشملان جميع العمليات
 - **شريط أدوات عائم** ينزلق تلقائياً — يمكن تبديل موضعه بين يسار ويمين الشاشة
 - **System Tray** للتشغيل في الخلفية
 - **اختصارات لوحة المفاتيح** العالمية (تعمل من أي تطبيق)
@@ -77,12 +80,20 @@ dotnet run
 ### 4. الرسم
 اختر الأداة المطلوبة من شريط الأدوات ثم ارسم مباشرة على الشاشة.
 
+### 5. التحديد والتعديل
+اختر أداة **التحديد** ثم:
+- **انقر** على أي كائن لتحديده
+- **اسحب** الكائن لنقله
+- **اسحب أحد المقابض** لتغيير حجمه
+- **انقر مزدوجاً** على نص لتعديله
+- غيّر **اللون أو السماكة** من شريط الأدوات بعد التحديد
+
 ---
 
 ## شريط الأدوات
 
 ```
-[ رسم/إيقاف ] | [ ● ● ● ● ● ● ● ● ] | [ ━ حجم ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⇌ ] | [ EN/ع ] | [ ✕ ]
+[ رسم/إيقاف ] | [ ● ● ● ● ● ● ● ● ] | [ ━ حجم ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⬚ ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⇌ ] | [ EN/ع ] | [ ✕ ]
 ```
 
 | العنصر | الوصف |
@@ -96,7 +107,8 @@ dotnet run
 | **▭ مستطيل** | مستطيل بالسحب |
 | **⬭ دائرة** | دائرة أو شكل بيضاوي بالسحب |
 | **T نص** | كتابة نص بخط Arial على الشاشة — اضغط Enter لسطر جديد، Esc للإلغاء |
-| **⌫ ممحاة** | محو الرسومات والأشكال والنصوص |
+| **⬚ تحديد** | تحديد الكائنات ونقلها وتغيير حجمها |
+| **⌫ ممحاة** | محو الكائن بالكامل بلمسة واحدة |
 | **↩ تراجع** | تراجع عن آخر خطوة |
 | **↪ إعادة** | إعادة الخطوة الملغاة |
 | **🗑 مسح الكل** | مسح جميع الرسومات مع رسالة تأكيد |
@@ -178,6 +190,26 @@ ScreenWriter/
 
 ---
 
+## سجل التغييرات
+
+### v2.0.0
+- إضافة أداة **التحديد / النقل / تغيير الحجم** لجميع الكائنات (أشكال، نصوص، رسم حر)
+- دعم **تعديل النص** بالنقر المزدوج في وضع التحديد
+- **تغيير لون وسماكة** الكائن المحدد مباشرة من شريط الأدوات
+- مزامنة **شريط السماكة** تلقائياً عند تحديد كائن
+- إطار وهمي عند **مرور الماوس** فوق أي كائن في وضع التحديد أو الممحاة
+- الممحاة تمسح **الكائن كاملاً** بلمسة واحدة
+- تغيير شكل **مؤشر الماوس** حسب المقبض عند تغيير الحجم
+
+### v1.0.1
+- إصلاح مشكلة تشغيل متعدد للتطبيق
+- تحسينات على خدمة التحديث التلقائي
+
+### v1.0.0
+- الإصدار الأول
+
+---
+
 ## الترخيص
 
 MIT License — حر الاستخدام والتعديل والتوزيع.
@@ -208,8 +240,11 @@ Download the app from the official page:
 - **Visible in screen share** — works with Zoom, Teams, Google Meet, and OBS
 - **Bilingual support** — Arabic & English with instant toggle from the toolbar
 - **Multiple drawing tools** — free draw, arrow, straight line, rectangle, circle/ellipse, text
+- **Select tool** — select any object to move or resize it, double-click text to edit it
+- **Change color and thickness of selected objects** — directly from the toolbar after selecting
 - **8 colors** with full pen size control
-- **Eraser** and full undo/redo (including clear all)
+- **Eraser** that removes the entire object in one touch
+- **Full undo/redo** covering all operations
 - **Floating toolbar** — auto-slides in; position can be toggled between left and right
 - **System Tray** for background operation
 - **Global hotkeys** — work from any app
@@ -260,12 +295,20 @@ Click the **"Draw"** button in the toolbar or press `Ctrl + Alt + D`
 ### 4. Draw
 Select a tool from the toolbar and draw directly on the screen.
 
+### 5. Select and edit
+Choose the **Select** tool then:
+- **Click** any object to select it
+- **Drag** to move it
+- **Drag a handle** to resize it
+- **Double-click** text to edit it
+- Change **color or thickness** from the toolbar while an object is selected
+
 ---
 
 ## Toolbar
 
 ```
-[ Draw/Stop ] | [ ● ● ● ● ● ● ● ● ] | [ ━ Size ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⇌ ] | [ EN/ع ] | [ ✕ ]
+[ Draw/Stop ] | [ ● ● ● ● ● ● ● ● ] | [ ━ Size ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⬚ ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⇌ ] | [ EN/ع ] | [ ✕ ]
 ```
 
 | Element | Description |
@@ -279,7 +322,8 @@ Select a tool from the toolbar and draw directly on the screen.
 | **▭ Rectangle** | Rectangle by dragging |
 | **⬭ Circle** | Circle or ellipse by dragging |
 | **T Text** | Write text on screen — Enter for new line, Esc to cancel |
-| **⌫ Eraser** | Erase drawings, shapes, and text |
+| **⬚ Select** | Select, move, and resize any object |
+| **⌫ Eraser** | Remove the entire object in one touch |
 | **↩ Undo** | Undo last action |
 | **↪ Redo** | Redo undone action |
 | **🗑 Clear All** | Clear all drawings with confirmation |
@@ -358,6 +402,26 @@ ScreenWriter/
 | **WS_EX_LAYERED** | Full transparency support |
 | **RegisterHotKey (Win32)** | Global hotkeys that work from any app |
 | **DWM Compositing** | Drawings are visible in screen capture automatically |
+
+---
+
+## Changelog
+
+### v2.0.0
+- Added **Select / Move / Resize** tool for all object types (shapes, text, freehand strokes)
+- **Double-click to edit** text in select mode
+- **Change color and thickness** of any selected object from the toolbar
+- **Size slider auto-syncs** to the selected object's thickness
+- Hover highlight on any object in Select or Eraser mode
+- Eraser now removes the **entire object** in one touch
+- **Cursor changes** to the appropriate resize arrow when hovering over handles
+
+### v1.0.1
+- Fixed multiple-instance detection issue
+- Improvements to the auto-update service
+
+### v1.0.0
+- Initial release
 
 ---
 

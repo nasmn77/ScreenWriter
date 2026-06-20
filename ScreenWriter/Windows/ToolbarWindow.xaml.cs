@@ -81,6 +81,7 @@ public partial class ToolbarWindow : Window
                 { BtnRect,    "rect"    },
                 { BtnEllipse, "ellipse" },
                 { BtnText,    "text"    },
+                { BtnSelect,  "select"  },
                 { BtnEraser,  "eraser"  },
             };
             _hiddenTop = -(ActualHeight - TriggerHeight);
@@ -149,13 +150,20 @@ public partial class ToolbarWindow : Window
             DrawingTool.Rectangle => BtnRect,
             DrawingTool.Ellipse   => BtnEllipse,
             DrawingTool.Text      => BtnText,
+            DrawingTool.Select    => BtnSelect,
             _                     => BtnPen,
         };
         SetActiveTool(tool, btn);
     }
 
+    private bool _suppressPenSizeEvent;
+
     public void RestoreInitialPenSize(double size)
-        => SizeSlider.Value = size;
+    {
+        _suppressPenSizeEvent = true;
+        SizeSlider.Value = size;
+        _suppressPenSizeEvent = false;
+    }
 
     // ── Mode indicator ────────────────────────────────────────────────────────
     private void BtnToggleMode_Click(object sender, RoutedEventArgs e)
@@ -194,6 +202,8 @@ public partial class ToolbarWindow : Window
     private void BtnRect_Click   (object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Rectangle, BtnRect);
     private void BtnEllipse_Click(object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Ellipse,   BtnEllipse);
     private void BtnText_Click   (object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Text,      BtnText);
+
+    private void BtnSelect_Click (object sender, RoutedEventArgs e) => SetActiveTool(DrawingTool.Select, BtnSelect);
 
     private void BtnEraser_Click(object sender, RoutedEventArgs e)
     {
@@ -253,7 +263,10 @@ public partial class ToolbarWindow : Window
 
     // ── Slider ────────────────────────────────────────────────────────────────
     private void SizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        => PenSizeChanged?.Invoke(e.NewValue);
+    {
+        if (!_suppressPenSizeEvent)
+            PenSizeChanged?.Invoke(e.NewValue);
+    }
 
     // ── Undo / Redo / Clear / Close / About / Lang ────────────────────────────
     private void BtnUndo_Click    (object sender, RoutedEventArgs e) => UndoRequested?.Invoke();

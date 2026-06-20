@@ -24,6 +24,7 @@
     <sys:String x:Key="Str_ToolRect">مستطيل</sys:String>
     <sys:String x:Key="Str_ToolEllipse">دائرة / بيضاوي</sys:String>
     <sys:String x:Key="Str_ToolText">كتابة نص</sys:String>
+    <sys:String x:Key="Str_ToolSelect">تحديد / نقل</sys:String>
     <sys:String x:Key="Str_ToolEraser">ممحاة</sys:String>
     <sys:String x:Key="Str_ToolArrow">سهم</sys:String>
 
