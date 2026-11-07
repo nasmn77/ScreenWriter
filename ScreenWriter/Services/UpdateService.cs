@@ -80,6 +80,25 @@ public sealed class UpdateService
         }
     }
 
+    public void OpenStoreReview()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(
+                $"ms-windows-store://review/?ProductId={StoreProductId}")
+            { UseShellExecute = true });
+        }
+        catch
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo($"https://apps.microsoft.com/detail/{StoreProductId}")
+                { UseShellExecute = true });
+            }
+            catch { }
+        }
+    }
+
     public bool LastCheckFailed { get; private set; }
 
     public async Task<UpdateInfo?> CheckAsync(CancellationToken ct)

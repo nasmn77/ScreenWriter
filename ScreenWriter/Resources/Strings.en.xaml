@@ -60,6 +60,7 @@
     <sys:String x:Key="Str_AboutTitle">About</sys:String>
     <sys:String x:Key="Str_AboutDescription">Draw and annotate on screen</sys:String>
     <sys:String x:Key="Str_AuthorName">Naser Almadi</sys:String>
+    <sys:String x:Key="Str_RateApp">Rate &amp; review</sys:String>
 
     <!-- Updates -->
     <sys:String x:Key="Str_CheckForUpdates">Check for updates</sys:String>

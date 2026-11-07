@@ -36,6 +36,37 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="OutlineBtn" TargetType="Button">
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="#06D6A0"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="FontWeight"      Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush"     Value="#3006D6A0"/>
+            <Setter Property="Padding"         Value="14,6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1A06D6A0"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Border CornerRadius="16" Background="#FF111827"
@@ -106,35 +137,17 @@
                 <!-- Update section -->
                 <Rectangle Height="1" Fill="#14FFFFFF" Margin="0,14,0,12"/>
 
-                <Button x:Name="BtnCheckUpdates"
-                        Content="{DynamicResource Str_CheckForUpdates}"
-                        Click="BtnCheckUpdates_Click"
-                        HorizontalAlignment="Center"
-                        Cursor="Hand"
-                        Background="Transparent"
-                        Foreground="#06D6A0"
-                        FontSize="12" FontWeight="SemiBold"
-                        BorderThickness="1" BorderBrush="#3006D6A0"
-                        Padding="16,6">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="8" Padding="{TemplateBinding Padding}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#1A06D6A0"/>
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Opacity" Value="0.5"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="BtnCheckUpdates"
+                            Style="{StaticResource OutlineBtn}"
+                            Content="{DynamicResource Str_CheckForUpdates}"
+                            Click="BtnCheckUpdates_Click"/>
+                    <Button x:Name="BtnRateApp"
+                            Style="{StaticResource OutlineBtn}"
+                            Content="{DynamicResource Str_RateApp}"
+                            Click="BtnRateApp_Click"
+                            Margin="8,0,0,0"/>
+                </StackPanel>
 
                 <TextBlock x:Name="TxtUpdateStatus"
                            FontSize="11" Foreground="#9CA3AF"

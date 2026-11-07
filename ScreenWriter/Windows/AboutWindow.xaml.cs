@@ -44,6 +44,12 @@ public partial class AboutWindow : Window
 
     private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) => DragMove();
 
+    private void BtnRateApp_Click(object sender, RoutedEventArgs e)
+    {
+        UpdateService.Instance.OpenStoreReview();
+        Close(); // النافذة Topmost وقد تغطي نافذة المتجر
+    }
+
     private async void BtnCheckUpdates_Click(object sender, RoutedEventArgs e)
     {
         if (UpdateService.IsPackagedApp)

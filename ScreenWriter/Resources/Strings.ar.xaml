@@ -60,6 +60,7 @@
     <sys:String x:Key="Str_AboutTitle">عن البرنامج</sys:String>
     <sys:String x:Key="Str_AboutDescription">تطبيق رسم وتوضيح فوق الشاشة</sys:String>
     <sys:String x:Key="Str_AuthorName">ناصر الماضي</sys:String>
+    <sys:String x:Key="Str_RateApp">التقييم والمراجعة</sys:String>
 
     <!-- Updates -->
     <sys:String x:Key="Str_CheckForUpdates">التحقق من التحديثات</sys:String>

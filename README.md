@@ -192,6 +192,9 @@ ScreenWriter/
 
 ## سجل التغييرات
 
+### v2.0.1
+- إضافة زر **التقييم والمراجعة** في نافذة «عن البرنامج» يفتح نموذج التقييم في المتجر مباشرة
+
 ### v2.0.0
 - إضافة أداة **التحديد / النقل / تغيير الحجم** لجميع الكائنات (أشكال، نصوص، رسم حر)
 - دعم **تعديل النص** بالنقر المزدوج في وضع التحديد
@@ -406,6 +409,9 @@ ScreenWriter/
 ---
 
 ## Changelog
+
+### v2.0.1
+- Added a **Rate & review** button in the About window that opens the Store review form directly
 
 ### v2.0.0
 - Added **Select / Move / Resize** tool for all object types (shapes, text, freehand strokes)
