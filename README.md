@@ -10,7 +10,7 @@
 
 حمّل التطبيق من صفحة التحميل الرسمية:
 
-### 👉 https://docs.naseralmadi.cloud/apps/ar/
+### 👉 https://nasmn77.github.io/ScreenWriter/ar/
 
 ---
 
@@ -233,7 +233,7 @@ A Windows app for drawing and annotating directly on screen, designed for explai
 
 Download the app from the official page:
 
-### 👉 https://docs.naseralmadi.cloud/apps/en/
+### 👉 https://nasmn77.github.io/ScreenWriter/en/
 
 ---
 
