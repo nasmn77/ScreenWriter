@@ -27,6 +27,8 @@
 - **8 ألوان** مع تحكم كامل في حجم القلم
 - **ممحاة** تمسح الكائن كاملاً بلمسة واحدة
 - **تراجع/إعادة** كاملين يشملان جميع العمليات
+- **سبورة بيضاء وسوداء للتعليم** — لكل سبورة رسوماتها وسجل تراجعها، مع ألوان قلم مناسبة لخلفيتها
+- **شريط الأدوات مخفي في البث** — يراه المستخدم ولا يظهر للمشاهدين (Windows 10 2004 أو أحدث)
 - **شريط أدوات عائم** ينزلق تلقائياً — يمكن تبديل موضعه بين يسار ويمين الشاشة
 - **System Tray** للتشغيل في الخلفية
 - **اختصارات لوحة المفاتيح** العالمية (تعمل من أي تطبيق)
@@ -75,6 +77,15 @@ dotnet run
 - الدائرة الخضراء = وضع الرسم نشط ✅
 - الدائرة الرمادية = وضع المرور (click-through) ⭕
 
+### السبورة
+افتح قائمة **السبورة** (بجانب زر الرسم) واختر **سبورة بيضاء** أو **سبورة سوداء**، أو اضغط `Ctrl + Alt + W` / `Ctrl + Alt + B`.
+
+- تغطي السبورة الشاشة التي عليها مؤشر الفأرة، وتبقى باقي الشاشات طبيعية
+- لكل وضع (الشاشة، البيضاء، السوداء) رسوماته وسجل تراجعه ولون قلمه الخاص
+- يبقى شريط الأدوات ظاهراً طوال الوقت على السبورة
+- للعودة للشاشة: اختر **الشاشة (شفاف)** من القائمة، أو اضغط `Ctrl + Alt + T`، أو اختصار السبورة نفسها مرة أخرى
+- رسومات السبورة لا تُحفظ بعد إغلاق التطبيق، ويظهر تنبيه عند الخروج إذا كانت تحتوي على رسومات
+
 ### 4. الرسم
 اختر الأداة المطلوبة من شريط الأدوات ثم ارسم مباشرة على الشاشة.
 
@@ -91,12 +102,13 @@ dotnet run
 ## شريط الأدوات
 
 ```
-[ رسم/إيقاف ] | [ ● ● ● ● ● ● ● ● ] | [ ━ حجم ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⬚ ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⓘ ⇌ EN/ع ✕ ]
+[ رسم/إيقاف ▢▾ ] | [ ● ● ● ● ● ● ● ● ] | [ ━ حجم ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⬚ ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⓘ ⇌ EN/ع ✕ ]
 ```
 
 | العنصر | الوصف |
 |---|---|
 | **رسم / إيقاف** | تفعيل أو إيقاف وضع الرسم |
+| **▢▾ السبورة** | قائمة لاختيار الوضع: الشاشة (شفاف)، سبورة بيضاء، سبورة سوداء |
 | **● الألوان** | أحمر، برتقالي، أصفر، أخضر، أزرق، بنفسجي، أبيض، أسود |
 | **━ الحجم** | شريط تمرير لضبط سماكة القلم (2–30) |
 | **🖊 رسم حر** | خطوط حرة سلسة |
@@ -125,6 +137,9 @@ dotnet run
 | `Ctrl + Alt + C` | مسح جميع الرسومات (مع تأكيد) |
 | `Ctrl + Z` | تراجع (أثناء وضع الرسم) |
 | `Ctrl + Y` | إعادة (أثناء وضع الرسم) |
+| `Ctrl + Alt + W` | سبورة بيضاء |
+| `Ctrl + Alt + B` | سبورة سوداء |
+| `Ctrl + Alt + T` | العودة للشاشة (الوضع الشفاف) |
 
 ---
 
@@ -158,7 +173,7 @@ dotnet run
 ScreenWriter/
 ├── App.xaml / App.xaml.cs          # نقطة الدخول وربط المكونات
 ├── Models/
-│   └── DrawingSettings.cs          # لوحة الألوان، enum أدوات الرسم
+│   └── DrawingSettings.cs          # لوحات الألوان لكل وضع، أدوات الرسم وأوضاع السبورة
 ├── Resources/
 │   ├── Strings.ar.xaml             # نصوص اللغة العربية
 │   └── Strings.en.xaml             # نصوص اللغة الإنجليزية
@@ -170,6 +185,7 @@ ScreenWriter/
 │   └── SplashWindow.xaml(.cs)      # شاشة البداية
 └── Services/
     ├── HotkeyService.cs            # اختصارات لوحة المفاتيح العالمية (Win32)
+    ├── CaptureExclusion.cs         # إخفاء شريط الأدوات من مشاركة الشاشة
     ├── TrayService.cs              # أيقونة System Tray
     ├── LocalizationService.cs      # إدارة اللغة والتبديل الفوري
     ├── SettingsService.cs          # حفظ واستعادة إعدادات المستخدم
@@ -188,10 +204,20 @@ ScreenWriter/
 | **WS_EX_LAYERED** | دعم الشفافية الكاملة |
 | **RegisterHotKey (Win32)** | اختصارات عالمية تعمل من أي تطبيق |
 | **DWM Compositing** | الرسومات مرئية في screen capture تلقائياً |
+| **SetWindowDisplayAffinity** | إخفاء شريط الأدوات وقوائمه من البث (`WDA_EXCLUDEFROMCAPTURE`) |
 
 ---
 
 ## سجل التغييرات
+
+### v2.1.0
+- **وضع السبورة للتعليم:** سبورة بيضاء وسوداء من قائمة جديدة في شريط الأدوات، أو بالاختصارات `Ctrl+Alt+W` / `Ctrl+Alt+B` / `Ctrl+Alt+T`
+- لكل وضع لوحة رسم مستقلة بسجل تراجع ولون قلم خاص، وتتبدل ألوان القلم لتكون واضحة على كل سبورة
+- السبورة تغطي الشاشة التي عليها مؤشر الفأرة فقط
+- **شريط الأدوات لا يظهر في البث** (Zoom، Teams، OBS) ويبقى ظاهراً للمستخدم
+- تنبيه عند الإغلاق إذا كانت السبورة تحتوي على رسومات
+- إصلاح: `Ctrl+Z` و`Ctrl+Y` لم تعودا تعطّلان التراجع في البرامج الأخرى عند إيقاف الرسم
+- إصلاحات في التراجع والإعادة: الممحاة، وتحريك وتغيير حجم السهم والخط، وحجم خط النص، وتعديل النص
 
 ### v2.0.1
 - إضافة زر **التقييم والمراجعة** في نافذة «عن البرنامج» يفتح نموذج التقييم في المتجر مباشرة
@@ -251,6 +277,8 @@ App page: https://nasmn77.github.io/ScreenWriter/en/
 - **8 colors** with full pen size control
 - **Eraser** that removes the entire object in one touch
 - **Full undo/redo** covering all operations
+- **Whiteboard and blackboard for teaching** — each board keeps its own drawings and undo history, with pen colors suited to its background
+- **Toolbar hidden from screen sharing** — you see it, viewers don't (Windows 10 2004 or later)
 - **Floating toolbar** — auto-slides in; position can be toggled between left and right
 - **System Tray** for background operation
 - **Global hotkeys** — work from any app
@@ -299,6 +327,15 @@ Click the **"Draw"** button in the toolbar or press `Ctrl + Alt + D`
 - Green dot = drawing mode active ✅
 - Gray dot = click-through mode ⭕
 
+### Board
+Open the **Board** menu (next to the Draw button) and choose **Whiteboard** or **Blackboard**, or press `Ctrl + Alt + W` / `Ctrl + Alt + B`.
+
+- The board covers the monitor under the mouse cursor; other monitors stay as they are
+- Each mode (screen, whiteboard, blackboard) has its own drawings, undo history, and pen color
+- The toolbar stays visible all the time on a board
+- To return to the screen: choose **Screen (transparent)** from the menu, press `Ctrl + Alt + T`, or press the board's own shortcut again
+- Board drawings are not saved after closing; you get a warning on exit if a board has drawings
+
 ### 4. Draw
 Select a tool from the toolbar and draw directly on the screen.
 
@@ -315,12 +352,13 @@ Choose the **Select** tool then:
 ## Toolbar
 
 ```
-[ Draw/Stop ] | [ ● ● ● ● ● ● ● ● ] | [ ━ Size ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⬚ ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⓘ ⇌ EN/ع ✕ ]
+[ Draw/Stop ▢▾ ] | [ ● ● ● ● ● ● ● ● ] | [ ━ Size ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⬚ ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⓘ ⇌ EN/ع ✕ ]
 ```
 
 | Element | Description |
 |---|---|
 | **Draw / Stop** | Toggle drawing mode on or off |
+| **▢▾ Board** | Menu to choose the mode: Screen (transparent), Whiteboard, Blackboard |
 | **● Colors** | Red, Orange, Yellow, Green, Blue, Purple, White, Black |
 | **━ Size** | Slider to adjust pen thickness (2–30) |
 | **🖊 Free Draw** | Smooth freehand lines |
@@ -349,6 +387,9 @@ Choose the **Select** tool then:
 | `Ctrl + Alt + C` | Clear all drawings (with confirmation) |
 | `Ctrl + Z` | Undo (while drawing mode is active) |
 | `Ctrl + Y` | Redo (while drawing mode is active) |
+| `Ctrl + Alt + W` | Whiteboard |
+| `Ctrl + Alt + B` | Blackboard |
+| `Ctrl + Alt + T` | Back to the screen (transparent mode) |
 
 ---
 
@@ -382,7 +423,7 @@ Right-click the app icon in the taskbar:
 ScreenWriter/
 ├── App.xaml / App.xaml.cs          # Entry point and component wiring
 ├── Models/
-│   └── DrawingSettings.cs          # Color palette, drawing tools enum
+│   └── DrawingSettings.cs          # Color palettes per mode, drawing tools and board modes
 ├── Resources/
 │   ├── Strings.ar.xaml             # Arabic strings
 │   └── Strings.en.xaml             # English strings
@@ -394,6 +435,7 @@ ScreenWriter/
 │   └── SplashWindow.xaml(.cs)      # Splash screen
 └── Services/
     ├── HotkeyService.cs            # Global hotkeys (Win32)
+    ├── CaptureExclusion.cs         # Hides the toolbar from screen sharing
     ├── TrayService.cs              # System Tray icon
     ├── LocalizationService.cs      # Language management and instant switching
     ├── SettingsService.cs          # Save and restore user settings
@@ -412,10 +454,20 @@ ScreenWriter/
 | **WS_EX_LAYERED** | Full transparency support |
 | **RegisterHotKey (Win32)** | Global hotkeys that work from any app |
 | **DWM Compositing** | Drawings are visible in screen capture automatically |
+| **SetWindowDisplayAffinity** | Hides the toolbar and its menus from capture (`WDA_EXCLUDEFROMCAPTURE`) |
 
 ---
 
 ## Changelog
+
+### v2.1.0
+- **Board mode for teaching:** whiteboard and blackboard from a new toolbar menu, or with `Ctrl+Alt+W` / `Ctrl+Alt+B` / `Ctrl+Alt+T`
+- Each mode has its own canvas, undo history and pen color; pen colors switch to ones that are visible on each board
+- A board covers only the monitor under the mouse cursor
+- **The toolbar is hidden from screen sharing** (Zoom, Teams, OBS) while staying visible to you
+- Warning on exit if a board has drawings
+- Fix: `Ctrl+Z` and `Ctrl+Y` no longer block undo in other apps while drawing is off
+- Undo/redo fixes: eraser, moving and resizing arrows and lines, text font size, and text editing
 
 ### v2.0.1
 - Added a **Rate & review** button in the About window that opens the Store review form directly

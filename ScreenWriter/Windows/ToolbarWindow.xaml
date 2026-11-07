@@ -65,6 +65,31 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- عنصر في قائمة السبورة -->
+        <Style x:Key="BoardItem" TargetType="Button">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="8,6"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="5" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#33FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Border x:Name="ToolbarBorder" Background="#E0111827" CornerRadius="0,0,12,0" Padding="10,7">
@@ -82,17 +107,88 @@
                 </StackPanel>
             </Button>
 
+            <!-- وضع السبورة: شفاف / أبيض / أسود -->
+            <Button x:Name="BtnBoard" Style="{StaticResource ToolBtn}" Padding="6,0"
+                    Click="BtnBoard_Click"
+                    ToolTip="{DynamicResource Str_Board}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border x:Name="BoardIcon" Width="18" Height="14" CornerRadius="2"
+                            BorderBrush="#CCCCCC" BorderThickness="1.5" Background="Transparent"/>
+                    <TextBlock Text="▾" Foreground="#CCCCCC" FontSize="11"
+                               VerticalAlignment="Center" Margin="3,0,0,0"/>
+                </StackPanel>
+            </Button>
+
+            <Popup x:Name="BoardPopup"
+                   PlacementTarget="{Binding ElementName=BtnBoard}"
+                   Placement="Bottom" VerticalOffset="4"
+                   StaysOpen="False" AllowsTransparency="True"
+                   PopupAnimation="Fade"
+                   Opened="BoardPopup_Opened" Closed="BoardPopup_Closed">
+                <Border Background="#F2111827" CornerRadius="8" Padding="4"
+                        BorderBrush="#44FFFFFF" BorderThickness="1">
+                    <StackPanel x:Name="BoardMenu" MinWidth="190">
+                        <Button x:Name="BoardItemTransparent" Style="{StaticResource BoardItem}"
+                                Tag="Transparent" Click="BoardItem_Click">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock x:Name="BoardCheckTransparent" DockPanel.Dock="Left" Width="16"
+                                           Text="✓" Foreground="#06D6A0" FontSize="12"/>
+                                <Border DockPanel.Dock="Left" Width="16" Height="12" CornerRadius="2"
+                                        BorderBrush="#CCCCCC" BorderThickness="1.5" Margin="0,0,8,0"/>
+                                <TextBlock DockPanel.Dock="Right" Text="Ctrl+Alt+T"
+                                           Foreground="#777777" FontSize="11" Margin="12,0,0,0"
+                                           FlowDirection="LeftToRight"/>
+                                <TextBlock Text="{DynamicResource Str_BoardTransparent}"
+                                           Foreground="#E5E7EB" FontSize="12"/>
+                            </DockPanel>
+                        </Button>
+                        <Button x:Name="BoardItemWhite" Style="{StaticResource BoardItem}"
+                                Tag="White" Click="BoardItem_Click">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock x:Name="BoardCheckWhite" DockPanel.Dock="Left" Width="16"
+                                           Text="✓" Foreground="#06D6A0" FontSize="12"/>
+                                <Border DockPanel.Dock="Left" Width="16" Height="12" CornerRadius="2"
+                                        Background="White" BorderBrush="#CCCCCC" BorderThickness="1"
+                                        Margin="0,0,8,0"/>
+                                <TextBlock DockPanel.Dock="Right" Text="Ctrl+Alt+W"
+                                           Foreground="#777777" FontSize="11" Margin="12,0,0,0"
+                                           FlowDirection="LeftToRight"/>
+                                <TextBlock Text="{DynamicResource Str_BoardWhite}"
+                                           Foreground="#E5E7EB" FontSize="12"/>
+                            </DockPanel>
+                        </Button>
+                        <Button x:Name="BoardItemBlack" Style="{StaticResource BoardItem}"
+                                Tag="Black" Click="BoardItem_Click">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock x:Name="BoardCheckBlack" DockPanel.Dock="Left" Width="16"
+                                           Text="✓" Foreground="#06D6A0" FontSize="12"/>
+                                <Border DockPanel.Dock="Left" Width="16" Height="12" CornerRadius="2"
+                                        Background="#121212" BorderBrush="#CCCCCC" BorderThickness="1"
+                                        Margin="0,0,8,0"/>
+                                <TextBlock DockPanel.Dock="Right" Text="Ctrl+Alt+B"
+                                           Foreground="#777777" FontSize="11" Margin="12,0,0,0"
+                                           FlowDirection="LeftToRight"/>
+                                <TextBlock Text="{DynamicResource Str_BoardBlack}"
+                                           Foreground="#E5E7EB" FontSize="12"/>
+                            </DockPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Popup>
+
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 
             <!-- ألوان -->
-            <Button Background="#E63946" Style="{StaticResource ColorBtn}" Tag="#E63946" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Red}"/>
-            <Button Background="#F4A261" Style="{StaticResource ColorBtn}" Tag="#F4A261" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Orange}"/>
-            <Button Background="#FFD166" Style="{StaticResource ColorBtn}" Tag="#FFD166" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Yellow}"/>
-            <Button Background="#06D6A0" Style="{StaticResource ColorBtn}" Tag="#06D6A0" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Green}"/>
-            <Button Background="#118AB2" Style="{StaticResource ColorBtn}" Tag="#118AB2" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Blue}"/>
-            <Button Background="#8338EC" Style="{StaticResource ColorBtn}" Tag="#8338EC" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Purple}"/>
-            <Button Background="#FFFFFF" Style="{StaticResource ColorBtn}" Tag="#FFFFFF" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_White}"/>
-            <Button Background="#111111" Style="{StaticResource ColorBtn}" Tag="#111111" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Black}"/>
+            <StackPanel x:Name="ColorPanel" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Background="#E63946" Style="{StaticResource ColorBtn}" Tag="#E63946" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Red}"/>
+                <Button Background="#F4A261" Style="{StaticResource ColorBtn}" Tag="#F4A261" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Orange}"/>
+                <Button Background="#FFD166" Style="{StaticResource ColorBtn}" Tag="#FFD166" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Yellow}"/>
+                <Button Background="#06D6A0" Style="{StaticResource ColorBtn}" Tag="#06D6A0" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Green}"/>
+                <Button Background="#118AB2" Style="{StaticResource ColorBtn}" Tag="#118AB2" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Blue}"/>
+                <Button Background="#8338EC" Style="{StaticResource ColorBtn}" Tag="#8338EC" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Purple}"/>
+                <Button Background="#FFFFFF" Style="{StaticResource ColorBtn}" Tag="#FFFFFF" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_White}"/>
+                <Button Background="#111111" Style="{StaticResource ColorBtn}" Tag="#111111" Click="ColorBtn_Click" ToolTip="{DynamicResource Str_Black}"/>
+            </StackPanel>
 
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 

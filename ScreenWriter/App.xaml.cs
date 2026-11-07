@@ -1,4 +1,5 @@
 using System.Windows;
+using MessageBox = System.Windows.MessageBox;
 using ScreenWriter.Models;
 using ScreenWriter.Services;
 using ScreenWriter.Windows;
@@ -74,7 +75,10 @@ public partial class App : System.Windows.Application
         _toolbar.ColorChanged   += color  =>
         {
             _overlay.SetColor(color);
-            SettingsService.Instance.SetColor(color.ToString());
+            // Only the screen (transparent) color is remembered between runs;
+            // board colors live in memory for the session.
+            if (_overlay.Mode == BoardMode.Transparent)
+                SettingsService.Instance.SetColor(color.ToString());
         };
         _toolbar.PenSizeChanged += size   =>
         {
@@ -96,7 +100,14 @@ public partial class App : System.Windows.Application
         _toolbar.UndoRequested  += ()     => _overlay.Undo();
         _toolbar.RedoRequested  += ()     => _overlay.Redo();
         _toolbar.ClearRequested += ()     => _overlay.ConfirmedClearAll();
-        _toolbar.ExitRequested  += ()     => Shutdown();
+        _toolbar.ExitRequested  += ()     => RequestExit(alwaysConfirm: true);
+        _toolbar.BoardModeRequested += SetBoardMode;
+        _overlay.BoardModeChanged   += mode =>
+        {
+            _toolbar.SyncBoardMode(mode, _overlay.CurrentColor);
+            _toolbar.SyncMode(_overlay.IsDrawingMode);
+            _toolbar.BringToTopmost();
+        };
         _toolbar.AboutRequested += ()     => new AboutWindow().Show();
         _toolbar.LangToggleRequested += () => LocalizationService.Instance.Switch();
         _toolbar.PositionToggleRequested += () =>
@@ -106,8 +117,10 @@ public partial class App : System.Windows.Application
             _toolbar.ApplyPosition(onRight);
         };
 
-        _tray    = new TrayService(_overlay, _toolbar);
-        _hotkeys = new HotkeyService(_overlay, _toolbar);
+        _tray    = new TrayService(_overlay, _toolbar, () => RequestExit(alwaysConfirm: false));
+        _hotkeys = new HotkeyService(_overlay, _toolbar, mode =>
+            // Pressing the shortcut of the current board returns to the screen.
+            SetBoardMode(mode == _overlay.Mode ? BoardMode.Transparent : mode));
 
         _overlay.Show();
         _toolbar.Show();
@@ -132,6 +145,36 @@ public partial class App : System.Windows.Application
                     Dispatcher.Invoke(() => UpdateDialog.Show(info));
             });
         }
+    }
+
+    private void SetBoardMode(BoardMode mode)
+    {
+        if (_overlay is null) return;
+        _overlay.SetBoardMode(mode);   // raises BoardModeChanged → syncs the toolbar
+    }
+
+    /// <summary>
+    /// Asks before exiting. Board drawings are not saved, so warn when a board has content;
+    /// otherwise ask only when <paramref name="alwaysConfirm"/> is set (toolbar ✕ button).
+    /// </summary>
+    private void RequestExit(bool alwaysConfirm)
+    {
+        var svc = LocalizationService.Instance;
+        string? msg = _overlay?.HasBoardContent == true ? svc.Get("Str_ExitBoardWarningMsg")
+                    : alwaysConfirm                    ? svc.Get("Str_CloseConfirmMsg")
+                    : null;
+        if (msg is not null)
+        {
+            // Owned by a topmost window so the dialog shows above an opaque board.
+            Window? owner = _toolbar is { IsVisible: true } ? _toolbar : _overlay;
+            var result = owner is not null
+                ? MessageBox.Show(owner, msg, svc.Get("Str_CloseConfirmTitle"),
+                      MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No)
+                : MessageBox.Show(msg, svc.Get("Str_CloseConfirmTitle"),
+                      MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+            if (result != MessageBoxResult.Yes) return;
+        }
+        Shutdown();
     }
 
     protected override void OnExit(ExitEventArgs e)

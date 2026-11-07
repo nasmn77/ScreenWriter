@@ -42,14 +42,41 @@ public partial class OverlayWindow : Window
     private static readonly nint HWND_TOPMOST = new(-1);
     private const uint SWP_NOMOVE        = 0x0002;
     private const uint SWP_NOSIZE        = 0x0001;
+    private const uint SWP_NOACTIVATE    = 0x0010;
 
     private const int WM_MOUSEACTIVATE   = 0x0021;
     private const int MA_NOACTIVATE      = 3;
 
     // ── History ───────────────────────────────────────────────────────────────
     private record HistoryEntry(Action Undo, Action Redo);
-    private readonly Stack<HistoryEntry> _undoStack = new();
-    private readonly Stack<HistoryEntry> _redoStack = new();
+
+    // ── Boards ────────────────────────────────────────────────────────────────
+    // Each board mode has its own canvas, undo/redo history and pen color.
+    // `Canvas`, `_undoStack` and `_redoStack` always point at the active board,
+    // so the drawing code below works on whichever board is shown.
+    private sealed class BoardState(InkCanvas canvas, Color color)
+    {
+        public InkCanvas Canvas { get; } = canvas;
+        public Stack<HistoryEntry> Undo { get; } = new();
+        public Stack<HistoryEntry> Redo { get; } = new();
+        public Color Color { get; set; } = color;
+    }
+
+    private readonly Dictionary<BoardMode, BoardState> _boards = [];
+    private BoardMode _mode = BoardMode.Transparent;
+    public  BoardMode Mode => _mode;
+
+    private InkCanvas            Canvas     => _boards[_mode].Canvas;
+    private Stack<HistoryEntry>  _undoStack => _boards[_mode].Undo;
+    private Stack<HistoryEntry>  _redoStack => _boards[_mode].Redo;
+
+    public Color CurrentColor => _currentColor;
+
+    /// <summary>True when the white or black board has anything drawn on it.</summary>
+    public bool HasBoardContent =>
+        CanvasHasContent(WhiteCanvas) || CanvasHasContent(BlackCanvas);
+
+    private static bool CanvasHasContent(InkCanvas c) => c.Strokes.Count > 0 || c.Children.Count > 0;
 
     // ── Drawing state ─────────────────────────────────────────────────────────
     private DrawingTool _currentTool    = DrawingTool.Pen;
@@ -61,6 +88,10 @@ public partial class OverlayWindow : Window
 
     // ── Text tool state ───────────────────────────────────────────────────────
     private Window?           _activeInputWindow;
+    // Set while an existing TextBlock is being edited: commit/cancel that edit
+    // (instead of creating a new TextBlock from the box).
+    private Action?           _editCommit;
+    private Action?           _editCancel;
     private Point             _activeTextPos;
     private double            _activeTextFontSize;
     private SolidColorBrush?  _activeTextBrush;
@@ -70,6 +101,10 @@ public partial class OverlayWindow : Window
 
     // ── Events ────────────────────────────────────────────────────────────────
     public event Action<double?>? SelectionThicknessChanged;
+    /// <summary>Raised after the board mode changes (from any source).</summary>
+    public event Action<BoardMode>? BoardModeChanged;
+    /// <summary>Raised whenever drawing mode turns on or off.</summary>
+    public event Action<bool>? DrawingModeChanged;
 
     // ── Arrow endpoints store ─────────────────────────────────────────────────
     private readonly Dictionary<Path, (Point P1, Point P2)> _arrowPoints = [];
@@ -87,6 +122,9 @@ public partial class OverlayWindow : Window
     private double _resizeOrigLeft, _resizeOrigTop, _resizeOrigW, _resizeOrigH;
     // For Line/Arrow resize: original endpoints
     private Point _resizeOrigP1, _resizeOrigP2;
+
+    // State of the selected element at the start of a move/resize (for undo)
+    private Action? _beforeEdit;
 
     // Selection overlay elements (owned by Canvas, removed on deselect)
     private Rectangle?   _selectionRect;
@@ -110,19 +148,26 @@ public partial class OverlayWindow : Window
         Loaded            += OnLoaded;
         SourceInitialized += OnSourceInitialized;
 
-        Canvas.StrokeCollected += (_, e) =>
+        _boards[BoardMode.Transparent] = new(ScreenCanvas, _currentColor);
+        _boards[BoardMode.White]       = new(WhiteCanvas,  DrawingSettings.DefaultBoardColor(BoardMode.White));
+        _boards[BoardMode.Black]       = new(BlackCanvas,  DrawingSettings.DefaultBoardColor(BoardMode.Black));
+
+        foreach (var board in _boards.Values)
         {
-            var stroke = e.Stroke;
-            _redoStack.Clear();
-            _undoStack.Push(new(
-                Undo: () => Canvas.Strokes.Remove(stroke),
-                Redo: () => Canvas.Strokes.Add(stroke)));
-        };
+            var c = board.Canvas;
+            c.StrokeCollected += (_, e) =>
+            {
+                var stroke = e.Stroke;
+                board.Redo.Clear();
+                board.Undo.Push(new(
+                    Undo: () => c.Strokes.Remove(stroke),
+                    Redo: () => c.Strokes.Add(stroke)));
+            };
 
-
-        Canvas.MouseDown += OnShapeMouseDown;
-        Canvas.MouseMove += OnShapeMouseMove;
-        Canvas.MouseUp   += OnShapeMouseUp;
+            c.MouseDown += OnShapeMouseDown;
+            c.MouseMove += OnShapeMouseMove;
+            c.MouseUp   += OnShapeMouseUp;
+        }
 
         SetDefaultAttributes();
     }
@@ -142,10 +187,7 @@ public partial class OverlayWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        Left   = SystemParameters.VirtualScreenLeft;
-        Top    = SystemParameters.VirtualScreenTop;
-        Width  = SystemParameters.VirtualScreenWidth;
-        Height = SystemParameters.VirtualScreenHeight;
+        CoverVirtualScreen();
 
         var hwnd  = new WindowInteropHelper(this).Handle;
         var style = GetWindowLong(hwnd, GWL_EXSTYLE);
@@ -154,9 +196,67 @@ public partial class OverlayWindow : Window
         ApplyClickThrough(true);
     }
 
+    // ── Window bounds ─────────────────────────────────────────────────────────
+    private void CoverVirtualScreen()
+    {
+        Left   = SystemParameters.VirtualScreenLeft;
+        Top    = SystemParameters.VirtualScreenTop;
+        Width  = SystemParameters.VirtualScreenWidth;
+        Height = SystemParameters.VirtualScreenHeight;
+    }
+
+    /// <summary>Covers only the monitor under the mouse cursor (physical pixels).</summary>
+    private void CoverMonitorUnderCursor()
+    {
+        var b    = System.Windows.Forms.Screen.FromPoint(System.Windows.Forms.Cursor.Position).Bounds;
+        var hwnd = new WindowInteropHelper(this).Handle;
+        SetWindowPos(hwnd, HWND_TOPMOST, b.Left, b.Top, b.Width, b.Height, SWP_NOACTIVATE);
+    }
+
+    // ── Board mode ────────────────────────────────────────────────────────────
+    public void SetBoardMode(BoardMode mode)
+    {
+        if (mode == _mode) return;
+
+        CommitTextBox();
+        Deselect();
+        DeselectStroke();
+        HideHoverRect();
+        Canvas.EditingMode = InkCanvasEditingMode.None;
+
+        _boards[_mode].Color = _currentColor;
+        _mode = mode;
+
+        foreach (var (m, board) in _boards)
+            board.Canvas.Visibility = m == mode ? Visibility.Visible : Visibility.Collapsed;
+
+        if (mode == BoardMode.Transparent) CoverVirtualScreen();
+        else                               CoverMonitorUnderCursor();
+
+        // The new canvas gets its own pen color and the current pen size.
+        _currentColor = _boards[mode].Color;
+        SetDefaultAttributes();
+
+        if (mode != BoardMode.Transparent && !_drawingMode)
+        {
+            // A board is always in drawing mode.
+            _drawingMode = true;
+            ApplyClickThrough(false);
+            DrawingModeChanged?.Invoke(true);
+        }
+        if (_drawingMode) SetTool(_currentTool);
+
+        BoardModeChanged?.Invoke(mode);
+    }
+
     // ── Mode / tool ───────────────────────────────────────────────────────────
     public void ToggleDrawingMode()
     {
+        // Turning drawing off on a board returns to the screen first,
+        // so no opaque board is left on screen that ignores input.
+        if (_drawingMode && _mode != BoardMode.Transparent)
+            SetBoardMode(BoardMode.Transparent);
+
         _drawingMode = !_drawingMode;
         if (!_drawingMode)
         {
@@ -172,6 +272,7 @@ public partial class OverlayWindow : Window
             ApplyClickThrough(false);
             SetTool(_currentTool);
         }
+        DrawingModeChanged?.Invoke(_drawingMode);
     }
 
     public void SetTool(DrawingTool tool)
@@ -382,7 +483,7 @@ public partial class OverlayWindow : Window
         Mouse.Capture(null);
 
         var (_, _, w, h) = NormalizeRect(_shapeStart, e.GetPosition(Canvas));
-        if (w < 2 && h < 2 && _currentTool is not DrawingTool.Line and not DrawingTool.Arrow)
+        if (w < 2 && h < 2)
         {
             Canvas.Children.Remove(_previewShape);
             _previewShape = null;
@@ -480,6 +581,7 @@ public partial class OverlayWindow : Window
                     else
                     {
                         CaptureResizeOrigin();
+                        if (_selectedElement is not null) _beforeEdit = SnapshotElement(_selectedElement);
                     }
                     Mouse.Capture(Canvas);
                     return;
@@ -500,6 +602,7 @@ public partial class OverlayWindow : Window
             var b = GetElementBounds(hit);
             _dragOrigLeft = b.Left;
             _dragOrigTop  = b.Top;
+            _beforeEdit   = SnapshotElement(hit);
             Mouse.Capture(Canvas);
             return;
         }
@@ -646,37 +749,22 @@ public partial class OverlayWindow : Window
 
         if (_selectedElement is null) { Mouse.Capture(null); return; }
 
-        if (_activeHandle != ResizeHandle.None)
+        bool moved = _activeHandle != ResizeHandle.None
+                  || (_isDragging && (Math.Abs(GetElementBounds(_selectedElement).Left - _dragOrigLeft) > 0.5
+                                   || Math.Abs(GetElementBounds(_selectedElement).Top  - _dragOrigTop)  > 0.5));
+        if (moved && _beforeEdit is not null)
         {
+            // Restore exact before/after state (points for lines and arrows, font size for text)
             var el     = _selectedElement;
-            var origL  = _resizeOrigLeft; var origT = _resizeOrigTop;
-            var origW  = _resizeOrigW;    var origH = _resizeOrigH;
-            var origP1 = _resizeOrigP1;   var origP2 = _resizeOrigP2;
-            var newBounds = GetElementBounds(el);
-
+            var before = _beforeEdit;
+            var after  = SnapshotElement(el);
             _redoStack.Clear();
             _undoStack.Push(new(
-                Undo: () => { RestoreElementBounds(el, origL, origT, origW, origH, origP1, origP2); UpdateSelectionOverlayFor(el); },
-                Redo: () => { ApplyBoundsToElement(el, newBounds.Left, newBounds.Top, newBounds.Width, newBounds.Height); UpdateSelectionOverlayFor(el); }));
-
-            _activeHandle = ResizeHandle.None;
+                Undo: () => { before(); UpdateSelectionOverlayFor(el); },
+                Redo: () => { after();  UpdateSelectionOverlayFor(el); }));
         }
-        else if (_isDragging)
-        {
-            var el   = _selectedElement;
-            var newB = GetElementBounds(el);
-            var newL = newB.Left;
-            var newT = newB.Top;
-
-            if (Math.Abs(newL - _dragOrigLeft) > 0.5 || Math.Abs(newT - _dragOrigTop) > 0.5)
-            {
-                var oL = _dragOrigLeft; var oT = _dragOrigTop;
-                _redoStack.Clear();
-                _undoStack.Push(new(
-                    Undo: () => { MoveElement(el, oL, oT);     UpdateSelectionOverlayFor(el); },
-                    Redo: () => { MoveElement(el, newL, newT); UpdateSelectionOverlayFor(el); }));
-            }
-        }
+        _beforeEdit   = null;
+        _activeHandle = ResizeHandle.None;
 
         _isDragging = false;
         Mouse.Capture(null);
@@ -1152,25 +1240,37 @@ public partial class OverlayWindow : Window
         }
     }
 
-    private void RestoreElementBounds(UIElement el,
-        double origL, double origT, double origW, double origH,
-        Point origP1, Point origP2)
+    /// <summary>Captures an element's position/size; the returned action puts it back exactly.</summary>
+    private Action SnapshotElement(UIElement el)
     {
-        if (el is Line ln)
+        switch (el)
         {
-            ln.X1 = origP1.X; ln.Y1 = origP1.Y;
-            ln.X2 = origP2.X; ln.Y2 = origP2.Y;
-            return;
+            case Line ln:
+            {
+                var (x1, y1, x2, y2) = (ln.X1, ln.Y1, ln.X2, ln.Y2);
+                return () => { ln.X1 = x1; ln.Y1 = y1; ln.X2 = x2; ln.Y2 = y2; };
+            }
+            case Path arrow when _arrowPoints.TryGetValue(arrow, out var pts):
+            {
+                return () =>
+                {
+                    _arrowPoints[arrow] = pts;
+                    arrow.Data = ComputeArrowGeometry(pts.P1, pts.P2, arrow.StrokeThickness);
+                };
+            }
+            case TextBlock tb:
+            {
+                var (l, t, fs) = (InkCanvas.GetLeft(tb), InkCanvas.GetTop(tb), tb.FontSize);
+                return () => { InkCanvas.SetLeft(tb, l); InkCanvas.SetTop(tb, t); tb.FontSize = fs; };
+            }
+            case FrameworkElement fe:
+            {
+                var (l, t, w, h) = (InkCanvas.GetLeft(fe), InkCanvas.GetTop(fe), fe.Width, fe.Height);
+                return () => { InkCanvas.SetLeft(fe, l); InkCanvas.SetTop(fe, t); fe.Width = w; fe.Height = h; };
+            }
+            default:
+                return () => { };
         }
-        if (el is Path arrow)
-        {
-            _arrowPoints[arrow] = (origP1, origP2);
-            arrow.Data = ComputeArrowGeometry(origP1, origP2, arrow.StrokeThickness);
-            return;
-        }
-        ApplyBoundsToElement(el, origL, origT, origW, origH);
-        if (el is TextBlock tb)
-            tb.FontSize = Math.Max(8, origH * 0.8);
     }
 
     // ── Element bounds ────────────────────────────────────────────────────────
@@ -1275,6 +1375,7 @@ public partial class OverlayWindow : Window
 
         Canvas.Children.Remove(hit);
         var removed = hit;
+        _redoStack.Clear();
         _undoStack.Push(new(
             Undo: () => Canvas.Children.Add(removed),
             Redo: () => Canvas.Children.Remove(removed)));
@@ -1299,6 +1400,7 @@ public partial class OverlayWindow : Window
             HideHoverRect();
             Canvas.Children.Remove(hitEl);
             var removed = hitEl;
+            _redoStack.Clear();
             _undoStack.Push(new(
                 Undo: () => Canvas.Children.Add(removed),
                 Redo: () => Canvas.Children.Remove(removed)));
@@ -1312,6 +1414,7 @@ public partial class OverlayWindow : Window
             HideHoverRect();
             Canvas.Strokes.Remove(hitStroke);
             var s = hitStroke;
+            _redoStack.Clear();
             _undoStack.Push(new(
                 Undo: () => Canvas.Strokes.Add(s),
                 Redo: () => Canvas.Strokes.Remove(s)));
@@ -1367,6 +1470,7 @@ public partial class OverlayWindow : Window
         {
             if (_activeInputWindow != win) return;
             _activeInputWindow = null;
+            _editCommit = _editCancel = null;
             var newText = tb.Text.Trim();
             win.Close();
             block.Visibility = Visibility.Visible;
@@ -1395,15 +1499,24 @@ public partial class OverlayWindow : Window
             block.Text = newText;
         }
 
+        void Cancel()
+        {
+            if (_activeInputWindow != win) return;
+            _activeInputWindow = null;
+            _editCommit = _editCancel = null;
+            win.Close();
+            block.Visibility = Visibility.Visible;
+        }
+
         _activeInputWindow = win;
+        _editCommit = Commit;
+        _editCancel = Cancel;
         tb.LostFocus += (_, _) => Dispatcher.BeginInvoke(Commit);
         tb.KeyDown   += (_, e) =>
         {
             if (e.Key == Key.Escape)
             {
-                _activeInputWindow = null;
-                win.Close();
-                block.Visibility = Visibility.Visible;
+                Cancel();
                 e.Handled = true;
             }
         };
@@ -1529,12 +1642,46 @@ public partial class OverlayWindow : Window
     // ── Undo / Redo ───────────────────────────────────────────────────────────
     public void Undo()
     {
-        if (_undoStack.TryPop(out var e)) { e.Undo(); _redoStack.Push(e); }
+        PrepareForHistory();
+        if (_undoStack.TryPop(out var e) && TryRun(e.Undo)) _redoStack.Push(e);
     }
 
     public void Redo()
     {
-        if (_redoStack.TryPop(out var e)) { e.Redo(); _undoStack.Push(e); }
+        PrepareForHistory();
+        if (_redoStack.TryPop(out var e) && TryRun(e.Redo)) _undoStack.Push(e);
+    }
+
+    // A selection or hover outline left on an element that undo removes would stay
+    // on the canvas, and an open text box must become its own history entry first.
+    private void PrepareForHistory()
+    {
+        CommitTextBox();
+        Deselect();
+        DeselectStroke();
+        HideHoverRect();
+    }
+
+    // An entry that no longer applies (e.g. adding an element that is already there)
+    // throws; the global error handler would then close the app. Skip it instead.
+    private static bool TryRun(Action action)
+    {
+        try { action(); return true; }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
+        {
+            System.Diagnostics.Debug.WriteLine($"History entry skipped: {ex.Message}");
+            return false;
+        }
+    }
+
+    /// <summary>True while the text tool's input box is open.</summary>
+    public bool IsEditingText => _activeInputWindow is not null;
+
+    /// <summary>Sends undo/redo to the open text box (the global Ctrl+Z/Y hotkey swallows the keys).</summary>
+    public void TextBoxUndoRedo(bool redo)
+    {
+        if (_activeInputWindow?.Content is not TextBox tb) return;
+        if (redo) tb.Redo(); else tb.Undo();
     }
 
     // ── Text tool ─────────────────────────────────────────────────────────────
@@ -1592,6 +1739,7 @@ public partial class OverlayWindow : Window
     private void CommitTextBox()
     {
         if (_activeInputWindow is null) return;
+        if (_editCommit is { } commitEdit) { commitEdit(); return; }
         var win = _activeInputWindow;
         _activeInputWindow = null;
 
@@ -1625,6 +1773,7 @@ public partial class OverlayWindow : Window
     private void CancelTextBox()
     {
         if (_activeInputWindow is null) return;
+        if (_editCancel is { } cancelEdit) { cancelEdit(); return; }
         var win = _activeInputWindow;
         _activeInputWindow = null;
         win.Close();
@@ -1665,7 +1814,9 @@ public partial class OverlayWindow : Window
         if (wasDrawing) ApplyClickThrough(true);
 
         var svc    = LocalizationService.Instance;
+        // Owned by the overlay so it shows above an opaque board.
         var result = MessageBox.Show(
+            this,
             svc.Get("Str_ClearConfirmMsg"),
             svc.Get("Str_ClearConfirmTitle"),
             MessageBoxButton.YesNo,

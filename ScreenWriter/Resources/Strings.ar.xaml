@@ -75,4 +75,11 @@
     <sys:String x:Key="Str_Downloading">جارٍ التنزيل…</sys:String>
     <sys:String x:Key="Str_Arrow">←</sys:String>
 
+    <!-- Board mode -->
+    <sys:String x:Key="Str_Board">وضع السبورة</sys:String>
+    <sys:String x:Key="Str_BoardTransparent">الشاشة (شفاف)</sys:String>
+    <sys:String x:Key="Str_BoardWhite">سبورة بيضاء</sys:String>
+    <sys:String x:Key="Str_BoardBlack">سبورة سوداء</sys:String>
+    <sys:String x:Key="Str_ExitBoardWarningMsg">رسومات السبورة ستُفقد عند الإغلاق. هل تريد الإغلاق؟</sys:String>
+
 </ResourceDictionary>

@@ -75,4 +75,11 @@
     <sys:String x:Key="Str_Downloading">Downloading…</sys:String>
     <sys:String x:Key="Str_Arrow">→</sys:String>
 
+    <!-- Board mode -->
+    <sys:String x:Key="Str_Board">Board mode</sys:String>
+    <sys:String x:Key="Str_BoardTransparent">Screen (transparent)</sys:String>
+    <sys:String x:Key="Str_BoardWhite">Whiteboard</sys:String>
+    <sys:String x:Key="Str_BoardBlack">Blackboard</sys:String>
+    <sys:String x:Key="Str_ExitBoardWarningMsg">Board drawings will be lost when you close. Close anyway?</sys:String>
+
 </ResourceDictionary>

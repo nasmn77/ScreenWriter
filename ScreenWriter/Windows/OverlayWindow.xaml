@@ -7,8 +7,21 @@
         Topmost="True"
         ShowInTaskbar="False"
         Title="ScreenWriter Overlay">
-    <InkCanvas x:Name="Canvas"
-               Background="#01000000"
-               EditingMode="None"
-               UseCustomCursor="True"/>
+    <!-- One InkCanvas per board mode; only the active one is visible. -->
+    <Grid>
+        <InkCanvas x:Name="ScreenCanvas"
+                   Background="#01000000"
+                   EditingMode="None"
+                   UseCustomCursor="True"/>
+        <InkCanvas x:Name="WhiteCanvas"
+                   Background="White"
+                   EditingMode="None"
+                   UseCustomCursor="True"
+                   Visibility="Collapsed"/>
+        <InkCanvas x:Name="BlackCanvas"
+                   Background="#121212"
+                   EditingMode="None"
+                   UseCustomCursor="True"
+                   Visibility="Collapsed"/>
+    </Grid>
 </Window>

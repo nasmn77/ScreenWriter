@@ -40,6 +40,7 @@ public partial class ToolbarWindow : Window
     public event Action?              AboutRequested;
     public event Action?              LangToggleRequested;
     public event Action?              PositionToggleRequested;
+    public event Action<BoardMode>?   BoardModeRequested;
 
     // ── Slide animation ───────────────────────────────────────────────────────
     private const double TriggerHeight = 4;
@@ -61,15 +62,31 @@ public partial class ToolbarWindow : Window
     private bool    _eraserActive;
     private bool    _currentModeIsDrawing;
 
+    // Auto-hide works on the transparent screen only; a board keeps the toolbar shown.
+    private bool     _autoHide = true;
+    private DateTime _boardPopupClosedAt;
+
     // ─────────────────────────────────────────────────────────────────────────
     public ToolbarWindow()
     {
         InitializeComponent();
 
-        LocalizationService.Instance.LanguageChanged += () => SyncMode(_currentModeIsDrawing);
+        LocalizationService.Instance.LanguageChanged += () =>
+        {
+            SyncMode(_currentModeIsDrawing);
+            BoardMenu.FlowDirection = LocalizationService.Instance.FlowDirection;
+        };
+        BoardMenu.FlowDirection = LocalizationService.Instance.FlowDirection;
+
+        // The toolbar, its menu and its tooltips are hidden from screen sharing.
+        SourceInitialized += (_, _) => CaptureExclusion.Apply(new WindowInteropHelper(this).Handle);
 
         _slideTimer.Tick     += OnSlide;
-        _hideDelayTimer.Tick += (_, _) => { _hideDelayTimer.Stop(); SlideTo(_hiddenTop); };
+        _hideDelayTimer.Tick += (_, _) =>
+        {
+            _hideDelayTimer.Stop();
+            if (_autoHide && !BoardPopup.IsOpen) SlideTo(_hiddenTop);
+        };
 
         Loaded += (_, _) =>
         {
@@ -115,7 +132,90 @@ public partial class ToolbarWindow : Window
     private void Toolbar_MouseLeave(object sender, MouseEventArgs e)
     {
         _hideDelayTimer.Stop();
-        _hideDelayTimer.Start();
+        if (_autoHide) _hideDelayTimer.Start();
+    }
+
+    // ── Board mode menu ───────────────────────────────────────────────────────
+    private void BtnBoard_Click(object sender, RoutedEventArgs e)
+    {
+        // A click on the button while the menu is open first closes it (StaysOpen=False);
+        // don't reopen it straight away.
+        if ((DateTime.Now - _boardPopupClosedAt).TotalMilliseconds < 250) return;
+        BoardPopup.IsOpen = !BoardPopup.IsOpen;
+    }
+
+    private void BoardPopup_Opened(object? sender, EventArgs e)
+    {
+        _hideDelayTimer.Stop();
+        CaptureExclusion.Apply(BoardPopup.Child);
+    }
+
+    private void BoardPopup_Closed(object? sender, EventArgs e)
+    {
+        _boardPopupClosedAt = DateTime.Now;
+        if (_autoHide && !IsMouseOver) _hideDelayTimer.Start();
+    }
+
+    private void BoardItem_Click(object sender, RoutedEventArgs e)
+    {
+        BoardPopup.IsOpen = false;
+        if (sender is Button { Tag: string tag } && Enum.TryParse<BoardMode>(tag, out var mode))
+            BoardModeRequested?.Invoke(mode);
+    }
+
+    // Tooltips open in their own popup windows; hide the toolbar's tooltips from capture too.
+    static ToolbarWindow()
+    {
+        EventManager.RegisterClassHandler(typeof(System.Windows.Controls.ToolTip),
+            System.Windows.Controls.ToolTip.OpenedEvent,
+            new RoutedEventHandler((s, _) =>
+            {
+                if (s is System.Windows.Controls.ToolTip { PlacementTarget: { } target }
+                    && Window.GetWindow(target) is ToolbarWindow)
+                    CaptureExclusion.Apply((System.Windows.Controls.ToolTip)s);
+            }));
+    }
+
+    /// <summary>Updates the board icon, menu check marks, color swatches and auto-hide.</summary>
+    public void SyncBoardMode(BoardMode mode, Color activeColor)
+    {
+        BoardIcon.Background = mode switch
+        {
+            BoardMode.White => Brushes.White,
+            BoardMode.Black => new SolidColorBrush(Color.FromRgb(0x12, 0x12, 0x12)),
+            _               => Brushes.Transparent,
+        };
+        BoardCheckTransparent.Visibility = mode == BoardMode.Transparent ? Visibility.Visible : Visibility.Hidden;
+        BoardCheckWhite.Visibility       = mode == BoardMode.White       ? Visibility.Visible : Visibility.Hidden;
+        BoardCheckBlack.Visibility       = mode == BoardMode.Black       ? Visibility.Visible : Visibility.Hidden;
+
+        // Swap the palette for colors that are visible on this background.
+        var palette = DrawingSettings.GetPalette(mode);
+        var buttons = ColorPanel.Children.OfType<Button>().ToList();
+        if (_activeColorBtn is not null) _activeColorBtn.BorderBrush = Brushes.Transparent;
+        _activeColorBtn = null;
+        for (int i = 0; i < buttons.Count && i < palette.Length; i++)
+        {
+            var c = (Color)ColorConverter.ConvertFromString(palette[i]);
+            buttons[i].Tag        = palette[i];
+            buttons[i].Background = new SolidColorBrush(c);
+            if (c == activeColor)
+            {
+                _activeColorBtn = buttons[i];
+                buttons[i].BorderBrush = Brushes.White;
+            }
+        }
+
+        _autoHide = mode == BoardMode.Transparent;
+        if (_autoHide)
+        {
+            if (!IsMouseOver && !BoardPopup.IsOpen) { _hideDelayTimer.Stop(); _hideDelayTimer.Start(); }
+        }
+        else
+        {
+            _hideDelayTimer.Stop();
+            SlideTo(0);
+        }
     }
 
     // ── Topmost ───────────────────────────────────────────────────────────────
@@ -272,17 +372,8 @@ public partial class ToolbarWindow : Window
     private void BtnUndo_Click    (object sender, RoutedEventArgs e) => UndoRequested?.Invoke();
     private void BtnRedo_Click    (object sender, RoutedEventArgs e) => RedoRequested?.Invoke();
     private void BtnClear_Click   (object sender, RoutedEventArgs e) => ClearRequested?.Invoke();
-    private void BtnClose_Click(object sender, RoutedEventArgs e)
-    {
-        var svc    = LocalizationService.Instance;
-        var result = System.Windows.MessageBox.Show(
-            svc.Get("Str_CloseConfirmMsg"),
-            svc.Get("Str_CloseConfirmTitle"),
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question,
-            MessageBoxResult.No);
-        if (result == MessageBoxResult.Yes) ExitRequested?.Invoke();
-    }
+    // The confirmation dialog is shown by App.RequestExit.
+    private void BtnClose_Click(object sender, RoutedEventArgs e) => ExitRequested?.Invoke();
     private void BtnAbout_Click   (object sender, RoutedEventArgs e) => AboutRequested?.Invoke();
     private void BtnLang_Click    (object sender, RoutedEventArgs e) => LangToggleRequested?.Invoke();
     private void BtnPosition_Click(object sender, RoutedEventArgs e) => PositionToggleRequested?.Invoke();

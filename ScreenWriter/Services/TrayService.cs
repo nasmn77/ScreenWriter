@@ -9,11 +9,13 @@ public sealed class TrayService : IDisposable
     private readonly NotifyIcon    _icon;
     private readonly OverlayWindow _overlay;
     private readonly ToolbarWindow _toolbar;
+    private readonly Action        _exit;
 
-    public TrayService(OverlayWindow overlay, ToolbarWindow toolbar)
+    public TrayService(OverlayWindow overlay, ToolbarWindow toolbar, Action exit)
     {
         _overlay = overlay;
         _toolbar = toolbar;
+        _exit    = exit;
 
         _icon = new NotifyIcon
         {
@@ -37,7 +39,7 @@ public sealed class TrayService : IDisposable
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(svc.Get("Str_TrayClearAll"),      null, (_, _) => Dispatch(_overlay.ConfirmedClearAll));
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add(svc.Get("Str_TrayExit"),          null, (_, _) => Dispatch(System.Windows.Application.Current.Shutdown));
+        menu.Items.Add(svc.Get("Str_TrayExit"),          null, (_, _) => Dispatch(_exit));
         return menu;
     }
 
