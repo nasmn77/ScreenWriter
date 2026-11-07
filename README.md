@@ -8,9 +8,11 @@
 
 ## 📥 التحميل
 
-حمّل التطبيق من صفحة التحميل الرسمية:
+حمّل التطبيق من **متجر مايكروسوفت** — تثبيت آمن وتحديثات تلقائية:
 
-### 👉 https://nasmn77.github.io/ScreenWriter/ar/
+### 👉 https://apps.microsoft.com/detail/9nf25dzqxlct
+
+صفحة التطبيق: https://nasmn77.github.io/ScreenWriter/ar/
 
 ---
 
@@ -36,13 +38,9 @@
 
 | المتطلب | الإصدار |
 |---|---|
-| Windows | 10 أو أحدث |
-| .NET Runtime | 10.0 |
+| Windows | 10 (الإصدار 1809) أو أحدث — 64-bit |
 
-لتحميل .NET Runtime:
-```
-https://dotnet.microsoft.com/download/dotnet/10.0
-```
+لا يحتاج تثبيت .NET؛ نسخة المتجر تتضمن كل ما يلزم للتشغيل.
 
 ---
 
@@ -93,7 +91,7 @@ dotnet run
 ## شريط الأدوات
 
 ```
-[ رسم/إيقاف ] | [ ● ● ● ● ● ● ● ● ] | [ ━ حجم ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⬚ ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⇌ ] | [ EN/ع ] | [ ✕ ]
+[ رسم/إيقاف ] | [ ● ● ● ● ● ● ● ● ] | [ ━ حجم ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⬚ ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⓘ ⇌ EN/ع ✕ ]
 ```
 
 | العنصر | الوصف |
@@ -112,6 +110,7 @@ dotnet run
 | **↩ تراجع** | تراجع عن آخر خطوة |
 | **↪ إعادة** | إعادة الخطوة الملغاة |
 | **🗑 مسح الكل** | مسح جميع الرسومات مع رسالة تأكيد |
+| **ⓘ عن البرنامج** | رقم الإصدار، التحقق من التحديثات، وزر التقييم والمراجعة في المتجر |
 | **⇌ موضع الشريط** | تبديل موضع شريط الأدوات بين يسار ويمين الشاشة |
 | **EN/ع اللغة** | تبديل فوري بين العربية والإنجليزية |
 | **✕ إغلاق** | إغلاق التطبيق نهائياً |
@@ -166,13 +165,15 @@ ScreenWriter/
 ├── Windows/
 │   ├── OverlayWindow.xaml(.cs)     # النافذة الشفافة الرئيسية + InkCanvas
 │   ├── ToolbarWindow.xaml(.cs)     # شريط الأدوات العائم
-│   ├── AboutWindow.xaml(.cs)       # نافذة "عن البرنامج"
+│   ├── AboutWindow.xaml(.cs)       # نافذة "عن البرنامج" (التحديثات + التقييم)
+│   ├── UpdateDialog.xaml(.cs)      # نافذة التحديث المتوفر
 │   └── SplashWindow.xaml(.cs)      # شاشة البداية
 └── Services/
     ├── HotkeyService.cs            # اختصارات لوحة المفاتيح العالمية (Win32)
     ├── TrayService.cs              # أيقونة System Tray
     ├── LocalizationService.cs      # إدارة اللغة والتبديل الفوري
-    └── SettingsService.cs          # حفظ واستعادة إعدادات المستخدم
+    ├── SettingsService.cs          # حفظ واستعادة إعدادات المستخدم
+    └── UpdateService.cs            # التحديثات وفتح صفحة التطبيق والتقييم في المتجر
 ```
 
 ---
@@ -231,9 +232,11 @@ A Windows app for drawing and annotating directly on screen, designed for explai
 
 ## 📥 Download
 
-Download the app from the official page:
+Get the app from the **Microsoft Store** — secure install and automatic updates:
 
-### 👉 https://nasmn77.github.io/ScreenWriter/en/
+### 👉 https://apps.microsoft.com/detail/9nf25dzqxlct
+
+App page: https://nasmn77.github.io/ScreenWriter/en/
 
 ---
 
@@ -259,8 +262,9 @@ Download the app from the official page:
 
 | Requirement | Version |
 |---|---|
-| Windows | 10 or later |
-| .NET Runtime | 10.0 |
+| Windows | 10 (version 1809) or later — 64-bit |
+
+No .NET install needed; the Store version includes everything required to run.
 
 ---
 
@@ -311,7 +315,7 @@ Choose the **Select** tool then:
 ## Toolbar
 
 ```
-[ Draw/Stop ] | [ ● ● ● ● ● ● ● ● ] | [ ━ Size ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⬚ ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⇌ ] | [ EN/ع ] | [ ✕ ]
+[ Draw/Stop ] | [ ● ● ● ● ● ● ● ● ] | [ ━ Size ] | [ 🖊 ⇒ ╱ ▭ ⬭ T ⬚ ⌫ ] | [ ↩ ↪ 🗑 ] | [ ⓘ ⇌ EN/ع ✕ ]
 ```
 
 | Element | Description |
@@ -330,6 +334,7 @@ Choose the **Select** tool then:
 | **↩ Undo** | Undo last action |
 | **↪ Redo** | Redo undone action |
 | **🗑 Clear All** | Clear all drawings with confirmation |
+| **ⓘ About** | Version info, check for updates, and Rate & review in the Store |
 | **⇌ Move Toolbar** | Toggle toolbar position between left and right |
 | **EN/ع** | Toggle language between English and Arabic |
 | **✕ Close** | Close the application |
@@ -384,13 +389,15 @@ ScreenWriter/
 ├── Windows/
 │   ├── OverlayWindow.xaml(.cs)     # Main transparent overlay + InkCanvas
 │   ├── ToolbarWindow.xaml(.cs)     # Floating toolbar
-│   ├── AboutWindow.xaml(.cs)       # About window
+│   ├── AboutWindow.xaml(.cs)       # About window (updates + rating)
+│   ├── UpdateDialog.xaml(.cs)      # Update-available dialog
 │   └── SplashWindow.xaml(.cs)      # Splash screen
 └── Services/
     ├── HotkeyService.cs            # Global hotkeys (Win32)
     ├── TrayService.cs              # System Tray icon
     ├── LocalizationService.cs      # Language management and instant switching
-    └── SettingsService.cs          # Save and restore user settings
+    ├── SettingsService.cs          # Save and restore user settings
+    └── UpdateService.cs            # Updates and opening the Store listing / review form
 ```
 
 ---
