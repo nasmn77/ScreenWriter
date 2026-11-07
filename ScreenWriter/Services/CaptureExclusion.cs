@@ -18,9 +18,14 @@ public static class CaptureExclusion
 
     public static bool IsSupported => Environment.OSVersion.Version.Build >= 19041;
 
+    // Developer switch for taking Store screenshots: SCREENWRITER_CAPTURE_TOOLBAR=1
+    // keeps the toolbar visible in screen capture. Not exposed in the UI.
+    private static readonly bool Disabled =
+        Environment.GetEnvironmentVariable("SCREENWRITER_CAPTURE_TOOLBAR") == "1";
+
     public static void Apply(nint hwnd)
     {
-        if (!IsSupported || hwnd == nint.Zero) return;
+        if (Disabled || !IsSupported || hwnd == nint.Zero) return;
         SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
     }
 

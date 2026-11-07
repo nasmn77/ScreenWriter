@@ -37,6 +37,11 @@ public sealed class LocalizationService
     public void Load()
     {
         _lang = ReadPref();
+#if DEBUG
+        // Store-screenshot demo runs pick the language without touching the saved preference
+        if (Environment.GetEnvironmentVariable("SCREENWRITER_DEMO_LANG") is Arabic or English)
+            _lang = Environment.GetEnvironmentVariable("SCREENWRITER_DEMO_LANG")!;
+#endif
         ApplyDictionary(_lang, notify: false);
     }
 

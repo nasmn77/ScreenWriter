@@ -135,6 +135,17 @@ public partial class App : System.Windows.Application
         _toolbar.RestoreInitialPenSize(SettingsService.Instance.LastPenSize);
         _toolbar.RestoreInitialTool(SettingsService.Instance.LastTool);
 
+#if DEBUG
+        // Store-screenshot demo scenes (Debug builds only)
+        var demo = Environment.GetEnvironmentVariable("SCREENWRITER_DEMO_SCENE");
+        if (!string.IsNullOrEmpty(demo))
+        {
+            var t = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(900) };
+            t.Tick += (_, _) => { t.Stop(); _overlay.LoadDemoScene(demo, _toolbar); };
+            t.Start();
+            return;   // no update check in demo runs
+        }
+#endif
         if (!UpdateService.IsPackagedApp)
         {
             _ = Task.Run(async () =>
