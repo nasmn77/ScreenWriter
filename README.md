@@ -29,6 +29,8 @@
 - **تراجع/إعادة** كاملين يشملان جميع العمليات
 - **سبورة بيضاء وسوداء للتعليم** — لكل سبورة رسوماتها وسجل تراجعها، مع ألوان قلم مناسبة لخلفيتها
 - **شريط الأدوات مخفي في البث** — يراه المستخدم ولا يظهر للمشاهدين (Windows 10 2004 أو أحدث)
+- **حفظ السبورة** — كصورة PNG، أو كملف `.swboard` قابل للتعديل يفتح بالنقر المزدوج
+- **إدراج الصور في السبورة** — من ملف أو باللصق أو بالسحب والإفلات، مع الكتابة فوقها
 - **شريط أدوات عائم** ينزلق تلقائياً — يمكن تبديل موضعه بين يسار ويمين الشاشة
 - **System Tray** للتشغيل في الخلفية
 - **اختصارات لوحة المفاتيح** العالمية (تعمل من أي تطبيق)
@@ -84,7 +86,9 @@ dotnet run
 - لكل وضع (الشاشة، البيضاء، السوداء) رسوماته وسجل تراجعه ولون قلمه الخاص
 - يبقى شريط الأدوات ظاهراً طوال الوقت على السبورة
 - للعودة للشاشة: اختر **الشاشة (شفاف)** من القائمة، أو اضغط `Ctrl + Alt + T`، أو اختصار السبورة نفسها مرة أخرى
-- رسومات السبورة لا تُحفظ بعد إغلاق التطبيق، ويظهر تنبيه عند الخروج إذا كانت تحتوي على رسومات
+- من قائمة **ملف** على السبورة: جديد، حفظ كصورة، نسخ كصورة، حفظ، حفظ باسم، فتح، إدراج صورة
+- ملف `.swboard` يحفظ كل عنصر قابلاً للتعديل، ويفتح على نوع السبورة الذي حُفظ منه
+- عند الفتح أو الخروج يسأل التطبيق عن حفظ التغييرات غير المحفوظة
 
 ### 4. الرسم
 اختر الأداة المطلوبة من شريط الأدوات ثم ارسم مباشرة على الشاشة.
@@ -109,6 +113,7 @@ dotnet run
 |---|---|
 | **رسم / إيقاف** | تفعيل أو إيقاف وضع الرسم |
 | **▢▾ السبورة** | قائمة لاختيار الوضع: الشاشة (شفاف)، سبورة بيضاء، سبورة سوداء |
+| **ملف ▾** | على السبورة فقط: جديد، حفظ كصورة، نسخ كصورة، حفظ، حفظ باسم، فتح، إدراج صورة |
 | **● الألوان** | أحمر، برتقالي، أصفر، أخضر، أزرق، بنفسجي، أبيض، أسود |
 | **━ الحجم** | شريط تمرير لضبط سماكة القلم (2–30) |
 | **🖊 رسم حر** | خطوط حرة سلسة |
@@ -140,6 +145,11 @@ dotnet run
 | `Ctrl + Alt + W` | سبورة بيضاء |
 | `Ctrl + Alt + B` | سبورة سوداء |
 | `Ctrl + Alt + T` | العودة للشاشة (الوضع الشفاف) |
+| `Ctrl + N` | سبورة جديدة (على السبورة) |
+| `Ctrl + S` | حفظ الملف (على السبورة) |
+| `Ctrl + O` | فتح ملف (على السبورة) |
+| `Ctrl + V` | لصق صورة (على السبورة) |
+| `Ctrl + Alt + S` | حفظ كصورة (على السبورة) |
 
 ---
 
@@ -186,6 +196,10 @@ ScreenWriter/
 └── Services/
     ├── HotkeyService.cs            # اختصارات لوحة المفاتيح العالمية (Win32)
     ├── CaptureExclusion.cs         # إخفاء شريط الأدوات من مشاركة الشاشة
+    ├── BoardActions.cs             # أوامر قائمة ملف والنوافذ والتنبيهات
+    ├── BoardFile.cs                # قراءة وكتابة ملفات .swboard
+    ├── BoardImage.cs               # تجهيز الصور المدرجة
+    ├── SingleInstancePipe.cs       # تمرير الملف إلى النسخة المفتوحة
     ├── TrayService.cs              # أيقونة System Tray
     ├── LocalizationService.cs      # إدارة اللغة والتبديل الفوري
     ├── SettingsService.cs          # حفظ واستعادة إعدادات المستخدم
@@ -209,6 +223,16 @@ ScreenWriter/
 ---
 
 ## سجل التغييرات
+
+### v2.2.0
+- **حفظ السبورة كصورة** PNG، ونسخها كصورة إلى الحافظة
+- **ملف `.swboard` قابل للتعديل** يحفظ كل عنصر، ويفتح بالنقر المزدوج على الملف
+- **إدراج الصور في السبورة** من ملف أو باللصق أو بالسحب والإفلات، مع الكتابة فوقها
+- قائمة **ملف** جديدة على السبورة، مع اختصارات `Ctrl+N` و`Ctrl+S` و`Ctrl+O` و`Ctrl+V` و`Ctrl+Alt+S`
+- سؤال عن حفظ التغييرات عند الفتح والخروج
+- إصلاح: شريط الأدوات كان يختفي خلف السبورة بعد رسالة «مسح الكل»
+- إصلاح: استرجاع آخر لون وحجم وأداة وموضع للشريط عند التشغيل
+- البحث عن التحديثات في المتجر عند التشغيل
 
 ### v2.1.0
 - **وضع السبورة للتعليم:** سبورة بيضاء وسوداء من قائمة جديدة في شريط الأدوات، أو بالاختصارات `Ctrl+Alt+W` / `Ctrl+Alt+B` / `Ctrl+Alt+T`
@@ -279,6 +303,8 @@ App page: https://nasmn77.github.io/ScreenWriter/en/
 - **Full undo/redo** covering all operations
 - **Whiteboard and blackboard for teaching** — each board keeps its own drawings and undo history, with pen colors suited to its background
 - **Toolbar hidden from screen sharing** — you see it, viewers don't (Windows 10 2004 or later)
+- **Save your boards** — as a PNG image, or as an editable `.swboard` file that opens with a double-click
+- **Insert images on a board** — from a file, by pasting, or by drag and drop, and write on top of them
 - **Floating toolbar** — auto-slides in; position can be toggled between left and right
 - **System Tray** for background operation
 - **Global hotkeys** — work from any app
@@ -334,7 +360,9 @@ Open the **Board** menu (next to the Draw button) and choose **Whiteboard** or *
 - Each mode (screen, whiteboard, blackboard) has its own drawings, undo history, and pen color
 - The toolbar stays visible all the time on a board
 - To return to the screen: choose **Screen (transparent)** from the menu, press `Ctrl + Alt + T`, or press the board's own shortcut again
-- Board drawings are not saved after closing; you get a warning on exit if a board has drawings
+- The **File** menu on a board has: New, Save as image, Copy as image, Save, Save as, Open, Insert image
+- A `.swboard` file keeps every object editable and opens on the board type it was saved from
+- When opening a file or exiting, the app asks about unsaved changes
 
 ### 4. Draw
 Select a tool from the toolbar and draw directly on the screen.
@@ -359,6 +387,7 @@ Choose the **Select** tool then:
 |---|---|
 | **Draw / Stop** | Toggle drawing mode on or off |
 | **▢▾ Board** | Menu to choose the mode: Screen (transparent), Whiteboard, Blackboard |
+| **File ▾** | On a board only: New, Save as image, Copy as image, Save, Save as, Open, Insert image |
 | **● Colors** | Red, Orange, Yellow, Green, Blue, Purple, White, Black |
 | **━ Size** | Slider to adjust pen thickness (2–30) |
 | **🖊 Free Draw** | Smooth freehand lines |
@@ -390,6 +419,11 @@ Choose the **Select** tool then:
 | `Ctrl + Alt + W` | Whiteboard |
 | `Ctrl + Alt + B` | Blackboard |
 | `Ctrl + Alt + T` | Back to the screen (transparent mode) |
+| `Ctrl + N` | New board (on a board) |
+| `Ctrl + S` | Save the file (on a board) |
+| `Ctrl + O` | Open a file (on a board) |
+| `Ctrl + V` | Paste an image (on a board) |
+| `Ctrl + Alt + S` | Save as image (on a board) |
 
 ---
 
@@ -436,6 +470,10 @@ ScreenWriter/
 └── Services/
     ├── HotkeyService.cs            # Global hotkeys (Win32)
     ├── CaptureExclusion.cs         # Hides the toolbar from screen sharing
+    ├── BoardActions.cs             # File menu commands, dialogs and prompts
+    ├── BoardFile.cs                # Reads and writes .swboard files
+    ├── BoardImage.cs               # Prepares inserted images
+    ├── SingleInstancePipe.cs       # Hands a file to the running instance
     ├── TrayService.cs              # System Tray icon
     ├── LocalizationService.cs      # Language management and instant switching
     ├── SettingsService.cs          # Save and restore user settings
@@ -459,6 +497,16 @@ ScreenWriter/
 ---
 
 ## Changelog
+
+### v2.2.0
+- **Save a board as a PNG image**, or copy it to the clipboard as an image
+- **Editable `.swboard` files** keep every object and open with a double-click
+- **Insert images on a board** from a file, by pasting, or by drag and drop, and write on top of them
+- New **File** menu on boards, with `Ctrl+N`, `Ctrl+S`, `Ctrl+O`, `Ctrl+V` and `Ctrl+Alt+S`
+- Prompt to save changes when opening a file or exiting
+- Fix: the toolbar could disappear behind a board after the "Clear all" message
+- Fix: the last color, pen size, tool and toolbar position are restored at startup
+- The app checks the Store for updates at startup
 
 ### v2.1.0
 - **Board mode for teaching:** whiteboard and blackboard from a new toolbar menu, or with `Ctrl+Alt+W` / `Ctrl+Alt+B` / `Ctrl+Alt+T`

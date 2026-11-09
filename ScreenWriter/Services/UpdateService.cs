@@ -99,6 +99,25 @@ public sealed class UpdateService
         }
     }
 
+    /// <summary>
+    /// Asks the Microsoft Store whether a newer version of this app exists.
+    /// Works only in the Store-installed package; any failure counts as "no update".
+    /// </summary>
+    public static async Task<bool> IsStoreUpdateAvailableAsync()
+    {
+        if (!IsPackagedApp) return false;
+        try
+        {
+            var context = global::Windows.Services.Store.StoreContext.GetDefault();
+            var updates = await context.GetAppAndOptionalStorePackageUpdatesAsync();
+            return updates.Count > 0;
+        }
+        catch (Exception)
+        {
+            return false;   // offline, Store unavailable, or not a Store install
+        }
+    }
+
     public bool LastCheckFailed { get; private set; }
 
     public async Task<UpdateInfo?> CheckAsync(CancellationToken ct)

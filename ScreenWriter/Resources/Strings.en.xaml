@@ -80,6 +80,29 @@
     <sys:String x:Key="Str_BoardTransparent">Screen (transparent)</sys:String>
     <sys:String x:Key="Str_BoardWhite">Whiteboard</sys:String>
     <sys:String x:Key="Str_BoardBlack">Blackboard</sys:String>
-    <sys:String x:Key="Str_ExitBoardWarningMsg">Board drawings will be lost when you close. Close anyway?</sys:String>
+
+    <!-- Board files and images -->
+    <sys:String x:Key="Str_File">File</sys:String>
+    <sys:String x:Key="Str_FileNew">New</sys:String>
+    <sys:String x:Key="Str_StoreUpdateMsg">A new version of Screen Writer is available in the Store. Open the update page now?</sys:String>
+    <sys:String x:Key="Str_FileSaveImage">Save as image…</sys:String>
+    <sys:String x:Key="Str_FileCopyImage">Copy as image</sys:String>
+    <sys:String x:Key="Str_FileSave">Save</sys:String>
+    <sys:String x:Key="Str_FileSaveAs">Save as…</sys:String>
+    <sys:String x:Key="Str_FileOpen">Open…</sys:String>
+    <sys:String x:Key="Str_FileInsertImage">Insert image…</sys:String>
+    <sys:String x:Key="Str_Saved">Saved ✓</sys:String>
+    <sys:String x:Key="Str_Copied">Copied ✓</sys:String>
+    <sys:String x:Key="Str_NoImageInClipboard">No image on the clipboard</sys:String>
+    <sys:String x:Key="Str_SaveChangesTitle">Unsaved changes</sys:String>
+    <sys:String x:Key="Str_BoardUnsavedWhite">The whiteboard has unsaved changes. Do you want to save them?</sys:String>
+    <sys:String x:Key="Str_BoardUnsavedBlack">The blackboard has unsaved changes. Do you want to save them?</sys:String>
+    <sys:String x:Key="Str_FileInvalid">The file could not be opened. It may be damaged or not a board file.</sys:String>
+    <sys:String x:Key="Str_FileNewer">This file was saved by a newer version of Screen Writer. Update the app and try again.</sys:String>
+    <sys:String x:Key="Str_FileSaveFailed">The file could not be saved. Check that the folder is writable.</sys:String>
+    <sys:String x:Key="Str_ImageInvalid">The image could not be inserted. Supported formats are PNG, JPG, BMP and GIF, up to 50 MB.</sys:String>
+    <sys:String x:Key="Str_ClipboardBusy">Another app is using the clipboard. Please try again.</sys:String>
+    <sys:String x:Key="Str_BoardFileType">Screen Writer board</sys:String>
+    <sys:String x:Key="Str_ImageFilter">Images</sys:String>
 
 </ResourceDictionary>

@@ -176,6 +176,82 @@
                 </Border>
             </Popup>
 
+            <!-- قائمة ملف: تظهر على السبورة فقط -->
+            <Button x:Name="BtnFile" Style="{StaticResource ToolBtn}" Padding="6,0"
+                    Click="BtnFile_Click" Visibility="Collapsed"
+                    ToolTip="{DynamicResource Str_File}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{DynamicResource Str_File}" Foreground="#CCCCCC" FontSize="12" VerticalAlignment="Center"/>
+                    <TextBlock Text="▾" Foreground="#CCCCCC" FontSize="11" VerticalAlignment="Center" Margin="3,0,0,0"/>
+                </StackPanel>
+            </Button>
+
+            <Popup x:Name="FilePopup"
+                   PlacementTarget="{Binding ElementName=BtnFile}"
+                   Placement="Bottom" VerticalOffset="4"
+                   StaysOpen="False" AllowsTransparency="True"
+                   PopupAnimation="Fade"
+                   Opened="FilePopup_Opened" Closed="FilePopup_Closed">
+                <Border Background="#F2111827" CornerRadius="8" Padding="4"
+                        BorderBrush="#44FFFFFF" BorderThickness="1">
+                    <StackPanel x:Name="FileMenu" MinWidth="210">
+                        <Button Style="{StaticResource BoardItem}" Tag="New" Click="FileItem_Click">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock DockPanel.Dock="Right" Text="Ctrl+N"
+                                           Foreground="#777777" FontSize="11" Margin="16,0,0,0"
+                                           FlowDirection="LeftToRight"/>
+                                <TextBlock Text="{DynamicResource Str_FileNew}" Foreground="#E5E7EB" FontSize="12"/>
+                            </DockPanel>
+                        </Button>
+                        <Rectangle Height="1" Fill="#33FFFFFF" Margin="4,3"/>
+                        <Button Style="{StaticResource BoardItem}" Tag="SaveImage" Click="FileItem_Click">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock DockPanel.Dock="Right" Text="Ctrl+Alt+S"
+                                           Foreground="#777777" FontSize="11" Margin="16,0,0,0"
+                                           FlowDirection="LeftToRight"/>
+                                <TextBlock Text="{DynamicResource Str_FileSaveImage}" Foreground="#E5E7EB" FontSize="12"/>
+                            </DockPanel>
+                        </Button>
+                        <Button Style="{StaticResource BoardItem}" Tag="CopyImage" Click="FileItem_Click">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock Text="{DynamicResource Str_FileCopyImage}" Foreground="#E5E7EB" FontSize="12"/>
+                            </DockPanel>
+                        </Button>
+                        <Rectangle Height="1" Fill="#33FFFFFF" Margin="4,3"/>
+                        <Button Style="{StaticResource BoardItem}" Tag="Save" Click="FileItem_Click">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock DockPanel.Dock="Right" Text="Ctrl+S"
+                                           Foreground="#777777" FontSize="11" Margin="16,0,0,0"
+                                           FlowDirection="LeftToRight"/>
+                                <TextBlock Text="{DynamicResource Str_FileSave}" Foreground="#E5E7EB" FontSize="12"/>
+                            </DockPanel>
+                        </Button>
+                        <Button Style="{StaticResource BoardItem}" Tag="SaveAs" Click="FileItem_Click">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock Text="{DynamicResource Str_FileSaveAs}" Foreground="#E5E7EB" FontSize="12"/>
+                            </DockPanel>
+                        </Button>
+                        <Button Style="{StaticResource BoardItem}" Tag="Open" Click="FileItem_Click">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock DockPanel.Dock="Right" Text="Ctrl+O"
+                                           Foreground="#777777" FontSize="11" Margin="16,0,0,0"
+                                           FlowDirection="LeftToRight"/>
+                                <TextBlock Text="{DynamicResource Str_FileOpen}" Foreground="#E5E7EB" FontSize="12"/>
+                            </DockPanel>
+                        </Button>
+                        <Rectangle Height="1" Fill="#33FFFFFF" Margin="4,3"/>
+                        <Button Style="{StaticResource BoardItem}" Tag="InsertImage" Click="FileItem_Click">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock DockPanel.Dock="Right" Text="Ctrl+V"
+                                           Foreground="#777777" FontSize="11" Margin="16,0,0,0"
+                                           FlowDirection="LeftToRight"/>
+                                <TextBlock Text="{DynamicResource Str_FileInsertImage}" Foreground="#E5E7EB" FontSize="12"/>
+                            </DockPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Popup>
+
             <Rectangle Width="1" Height="26" Fill="#44FFFFFF" Margin="6,0"/>
 
             <!-- ألوان -->

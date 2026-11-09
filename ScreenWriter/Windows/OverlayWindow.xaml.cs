@@ -14,6 +14,7 @@ using Rectangle      = System.Windows.Shapes.Rectangle;
 using Brushes        = System.Windows.Media.Brushes;
 using TextBox        = System.Windows.Controls.TextBox;
 using Path           = System.Windows.Shapes.Path;
+using Image          = System.Windows.Controls.Image;
 using Cursor         = System.Windows.Input.Cursor;
 using Cursors        = System.Windows.Input.Cursors;
 
@@ -54,12 +55,32 @@ public partial class OverlayWindow : Window
     // Each board mode has its own canvas, undo/redo history and pen color.
     // `Canvas`, `_undoStack` and `_redoStack` always point at the active board,
     // so the drawing code below works on whichever board is shown.
-    private sealed class BoardState(InkCanvas canvas, Color color)
+    private sealed class History(Action onChanged)
     {
-        public InkCanvas Canvas { get; } = canvas;
-        public Stack<HistoryEntry> Undo { get; } = new();
-        public Stack<HistoryEntry> Redo { get; } = new();
-        public Color Color { get; set; } = color;
+        private readonly Stack<HistoryEntry> _entries = new();
+
+        public void Push(HistoryEntry entry) { _entries.Push(entry); onChanged(); }
+        public bool TryPop(out HistoryEntry entry) => _entries.TryPop(out entry!);
+        public void Clear() => _entries.Clear();
+    }
+
+    private sealed class BoardState
+    {
+        public BoardState(InkCanvas canvas, Color color)
+        {
+            Canvas = canvas;
+            Color  = color;
+            // Every action, undo and redo goes through a Push.
+            Undo = new(() => Dirty = true);
+            Redo = new(() => Dirty = true);
+        }
+
+        public InkCanvas Canvas { get; }
+        public History Undo { get; }
+        public History Redo { get; }
+        public Color Color { get; set; }
+        public bool Dirty { get; set; }
+        public string? FilePath { get; set; }
     }
 
     private readonly Dictionary<BoardMode, BoardState> _boards = [];
@@ -67,14 +88,10 @@ public partial class OverlayWindow : Window
     public  BoardMode Mode => _mode;
 
     private InkCanvas            Canvas     => _boards[_mode].Canvas;
-    private Stack<HistoryEntry>  _undoStack => _boards[_mode].Undo;
-    private Stack<HistoryEntry>  _redoStack => _boards[_mode].Redo;
+    private History              _undoStack => _boards[_mode].Undo;
+    private History              _redoStack => _boards[_mode].Redo;
 
     public Color CurrentColor => _currentColor;
-
-    /// <summary>True when the white or black board has anything drawn on it.</summary>
-    public bool HasBoardContent =>
-        CanvasHasContent(WhiteCanvas) || CanvasHasContent(BlackCanvas);
 
     private static bool CanvasHasContent(InkCanvas c) => c.Strokes.Count > 0 || c.Children.Count > 0;
 
@@ -105,6 +122,8 @@ public partial class OverlayWindow : Window
     public event Action<BoardMode>? BoardModeChanged;
     /// <summary>Raised whenever drawing mode turns on or off.</summary>
     public event Action<bool>? DrawingModeChanged;
+    /// <summary>A dialog owned by this window closed; it left the overlay above the toolbar.</summary>
+    public event Action? OwnedDialogClosed;
 
     // ── Arrow endpoints store ─────────────────────────────────────────────────
     private readonly Dictionary<Path, (Point P1, Point P2)> _arrowPoints = [];
@@ -169,6 +188,7 @@ public partial class OverlayWindow : Window
             c.MouseUp   += OnShapeMouseUp;
         }
 
+        InitBoardDrop();
         SetDefaultAttributes();
     }
 
@@ -508,6 +528,7 @@ public partial class OverlayWindow : Window
         var hitEl = HitTestChild(pos);
         // Hit-test strokes
         Stroke? hitStroke = hitEl is null ? HitTestStroke(pos) : null;
+        if (hitEl is null && hitStroke is null) hitEl = HitTestImage(pos);
 
         if (hitEl == _hoveredElement && hitStroke == _hoveredStroke) return;
 
@@ -531,7 +552,10 @@ public partial class OverlayWindow : Window
         {
             Width            = bounds.Width  + pad * 2,
             Height           = bounds.Height + pad * 2,
-            Stroke           = new SolidColorBrush(Color.FromArgb(180, 255, 255, 255)),
+            // White would be invisible on the whiteboard
+            Stroke           = new SolidColorBrush(_mode == BoardMode.White
+                                   ? Color.FromArgb(200, 70, 70, 70)
+                                   : Color.FromArgb(180, 255, 255, 255)),
             StrokeThickness  = 1.2,
             StrokeDashArray  = new DoubleCollection([4, 3]),
             Fill             = Brushes.Transparent,
@@ -593,17 +617,7 @@ public partial class OverlayWindow : Window
         var hit = HitTestChild(pos);
         if (hit is not null)
         {
-            HideHoverRect();
-            DeselectStroke();
-            SelectElement(hit);
-            _isDragging   = true;
-            _activeHandle = ResizeHandle.None;
-            _dragStart    = pos;
-            var b = GetElementBounds(hit);
-            _dragOrigLeft = b.Left;
-            _dragOrigTop  = b.Top;
-            _beforeEdit   = SnapshotElement(hit);
-            Mouse.Capture(Canvas);
+            BeginElementDrag(hit, pos);
             return;
         }
 
@@ -618,8 +632,29 @@ public partial class OverlayWindow : Window
             return;
         }
 
+        if (HitTestImage(pos) is { } hitImage)
+        {
+            BeginElementDrag(hitImage, pos);
+            return;
+        }
+
         Deselect();
         DeselectStroke();
+    }
+
+    private void BeginElementDrag(UIElement element, Point pos)
+    {
+        HideHoverRect();
+        DeselectStroke();
+        SelectElement(element);
+        _isDragging   = true;
+        _activeHandle = ResizeHandle.None;
+        _dragStart    = pos;
+        var b = GetElementBounds(element);
+        _dragOrigLeft = b.Left;
+        _dragOrigTop  = b.Top;
+        _beforeEdit   = SnapshotElement(element);
+        Mouse.Capture(Canvas);
     }
 
     private static Cursor HandleToCursor(ResizeHandle h) => h switch
@@ -935,7 +970,7 @@ public partial class OverlayWindow : Window
         Canvas.Children.Add(_selectionRect);
 
         // 8 handles: TL T TR R BR B BL L  (indexes 1,3,5,7 are mid-edge — hidden for TextBlock)
-        bool isText = el is TextBlock;
+        bool isText = el is TextBlock or Image;   // corner handles only
         _handles = new Rectangle[8];
         var positions = GetHandlePositions(b, pad, hs);
         for (int i = 0; i < 8; i++)
@@ -1052,6 +1087,12 @@ public partial class OverlayWindow : Window
 
         var dx = pos.X - _dragStart.X;
         var dy = pos.Y - _dragStart.Y;
+
+        if (_selectedElement is Image picture)
+        {
+            ResizeImage(picture, dx, dy);
+            return;
+        }
 
         // Line and Arrow: each handle moves the nearest endpoint
         // P1 is the endpoint closer to TL, P2 closer to BR
@@ -1237,6 +1278,7 @@ public partial class OverlayWindow : Window
         {
             case Rectangle r:  r.Width = w; r.Height = h; break;
             case Ellipse   e:  e.Width = w; e.Height = h; break;
+            case Image     i:  i.Width = w; i.Height = h; break;
         }
     }
 
@@ -1340,6 +1382,7 @@ public partial class OverlayWindow : Window
             // Skip overlay elements
             if (child == _selectionRect || child == _hoverRect) continue;
             if (_handles is not null && Array.IndexOf(_handles, child) >= 0) continue;
+            if (child is Image) continue;   // see HitTestImage
 
             var b = GetElementBounds(child);
             var expanded = new Rect(b.Left - HitPad, b.Top - HitPad,
@@ -1390,6 +1433,7 @@ public partial class OverlayWindow : Window
         {
             if (child == _selectionRect || child == _hoverRect) continue;
             if (_handles is not null && Array.IndexOf(_handles, child) >= 0) continue;
+            if (child is Image) continue;   // erased last: images lie under everything
             var b = GetElementBounds(child);
             var expanded = new Rect(b.Left - HitPad, b.Top - HitPad,
                                     b.Width + HitPad * 2, b.Height + HitPad * 2);
@@ -1418,6 +1462,17 @@ public partial class OverlayWindow : Window
             _undoStack.Push(new(
                 Undo: () => Canvas.Strokes.Add(s),
                 Redo: () => Canvas.Strokes.Remove(s)));
+            return;
+        }
+
+        if (HitTestImage(pos) is { } image)
+        {
+            HideHoverRect();
+            Canvas.Children.Remove(image);
+            _redoStack.Clear();
+            _undoStack.Push(new(
+                Undo: () => Canvas.Children.Add(image),
+                Redo: () => Canvas.Children.Remove(image)));
         }
     }
 
@@ -1824,6 +1879,7 @@ public partial class OverlayWindow : Window
             MessageBoxResult.No);
 
         if (wasDrawing) ApplyClickThrough(false);
+        OwnedDialogClosed?.Invoke();
         if (result == MessageBoxResult.Yes) ClearAll();
     }
 }

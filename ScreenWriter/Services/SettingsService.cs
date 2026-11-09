@@ -15,6 +15,8 @@ public sealed class SettingsService
     public double      LastPenSize    { get; private set; } = DrawingSettings.DefaultPenSize;
     public DrawingTool LastTool       { get; private set; } = DrawingTool.Pen;
     public bool        ToolbarOnRight { get; private set; } = false;
+    public string?     LastImageFolder { get; private set; }
+    public string?     LastBoardFolder { get; private set; }
 
     public void Load()
     {
@@ -47,6 +49,12 @@ public sealed class SettingsService
                         if (bool.TryParse(val, out var right))
                             ToolbarOnRight = right;
                         break;
+                    case "ImageFolder":
+                        LastImageFolder = val;
+                        break;
+                    case "BoardFolder":
+                        LastBoardFolder = val;
+                        break;
                 }
             }
         }
@@ -55,6 +63,9 @@ public sealed class SettingsService
 
     public void Save()
     {
+#if DEBUG
+        if (Environment.GetEnvironmentVariable("SCREENWRITER_NO_SAVE") == "1") return;
+#endif
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(SettingsFile)!);
@@ -63,6 +74,8 @@ public sealed class SettingsService
                 $"PenSize={LastPenSize.ToString(System.Globalization.CultureInfo.InvariantCulture)}",
                 $"Tool={LastTool}",
                 $"ToolbarOnRight={ToolbarOnRight}",
+                $"ImageFolder={LastImageFolder}",
+                $"BoardFolder={LastBoardFolder}",
             ]);
         }
         catch { }
@@ -72,4 +85,6 @@ public sealed class SettingsService
     public void SetPenSize(double size)    { LastPenSize   = size; }
     public void SetTool(DrawingTool tool)  { LastTool      = tool; }
     public void SetToolbarOnRight(bool r)  { ToolbarOnRight = r; Save(); }
+    public void SetLastImageFolder(string f) { LastImageFolder = f; Save(); }
+    public void SetLastBoardFolder(string f) { LastBoardFolder = f; Save(); }
 }

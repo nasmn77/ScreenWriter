@@ -6,12 +6,14 @@ using System.Windows.Controls;
 using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using ScreenWriter.Models;
 using ScreenWriter.Services;
 using Color = System.Windows.Media.Color;
 using Point = System.Windows.Point;
 using ColorConverter = System.Windows.Media.ColorConverter;
 using FontFamily = System.Windows.Media.FontFamily;
+using Pen = System.Windows.Media.Pen;
 
 namespace ScreenWriter.Windows;
 
@@ -22,7 +24,7 @@ public partial class OverlayWindow
         bool ar = LocalizationService.Instance.IsArabic;
         var mode = scene switch
         {
-            "white" or "white-menu" => BoardMode.White,
+            "white" or "white-menu" or "white-file" => BoardMode.White,
             "black"                 => BoardMode.Black,
             _                       => BoardMode.Transparent,
         };
@@ -40,6 +42,7 @@ public partial class OverlayWindow
             case "screen-select": ScreenSelectScene(ar);   break;
             case "white":         WhiteScene(ar);          break;
             case "white-menu":    WhiteMenuScene(ar);      break;
+            case "white-file":    WhiteFileScene(ar);      break;
             case "black":         BlackScene(ar);          break;
         }
 
@@ -56,6 +59,7 @@ public partial class OverlayWindow
         toolbar.SyncBoardMode(mode, _currentColor);
         toolbar.PinForDemo();
         if (scene == "white-menu") toolbar.OpenBoardMenuForDemo();
+        if (scene == "white-file") toolbar.OpenFileMenuForDemo();
         toolbar.BringToTopmost();
     }
 
@@ -128,6 +132,71 @@ public partial class OverlayWindow
         DemoText("a² + b² = c²", new(830, 330), ink, 60, bold: true);
         DemoLoop(new(1025, 372), 225, 75, "#E63946", 5);
         DemoText("3² + 4² = 5²", new(860, 500), "#2B9348", 46, bold: false);
+    }
+
+    // A worksheet inserted as a picture and answered with the pen (zoomed like the menu scene).
+    private void WhiteFileScene(bool ar)
+    {
+        const double left = 430, top = 90;
+        var data = BoardImage.FromBytes(BoardImage.Encode(DrawWorksheet(ar), new PngBitmapEncoder()));
+        Canvas.Children.Add(CreateImage(data, left, top, data.Bitmap.PixelWidth, data.Bitmap.PixelHeight));
+
+        double[] centers = [150, 390, 630];
+        string[] answers = ["½", "¼", "¾"];
+        for (int i = 0; i < 3; i++)
+        {
+            double x = left + centers[i];
+            DemoText(answers[i], new(x - 26, top + 345), "#E63946", 62, bold: true);
+            DemoStroke([new(x + 44, top + 392), new(x + 58, top + 410), new(x + 94, top + 358)], "#2B9348", 7);
+        }
+        DemoLoop(new(left + 630, top + 225), 112, 112, "#E63946", 5);
+    }
+
+    private static BitmapSource DrawWorksheet(bool ar)
+    {
+        const int w = 780, h = 520;
+        var visual = new DrawingVisual();
+        using (var dc = visual.RenderOpen())
+        {
+            dc.DrawRoundedRectangle(new SolidColorBrush(Hex("#FFF8E7")), new Pen(new SolidColorBrush(Hex("#D9C9A3")), 2),
+                new Rect(1, 1, w - 2, h - 2), 14, 14);
+
+            var flow = ar ? System.Windows.FlowDirection.RightToLeft : System.Windows.FlowDirection.LeftToRight;
+            void Text(string s, double size, double y, FontWeight weight)
+            {
+                var text = new FormattedText(s, System.Globalization.CultureInfo.InvariantCulture, flow,
+                    new Typeface(new FontFamily("Arial"), FontStyles.Normal, weight, FontStretches.Normal),
+                    size, new SolidColorBrush(Hex("#2B2B2B")), 1.0)
+                { MaxTextWidth = w - 80, TextAlignment = TextAlignment.Center };
+                dc.DrawText(text, new Point(40, y));
+            }
+            Text(ar ? "ورقة عمل: الكسور" : "Worksheet: Fractions", 40, 26, FontWeights.Bold);
+            Text(ar ? "اكتب الكسر الذي يمثل الجزء الملوّن" : "Write the fraction for the shaded part", 26, 88, FontWeights.Normal);
+
+            var ink  = new Pen(new SolidColorBrush(Hex("#2B2B2B")), 3);
+            var fill = new SolidColorBrush(Hex("#7CC6E8"));
+            double[] xs = [150, 390, 630];
+            double[] parts = [0.5, 0.25, 0.75];
+            const double cy = 225, r = 85;
+            for (int i = 0; i < 3; i++)
+            {
+                var c = new Point(xs[i], cy);
+                double angle = parts[i] * 2 * Math.PI;
+                var end = new Point(c.X + r * Math.Sin(angle), c.Y - r * Math.Cos(angle));
+                var figure = new PathFigure { StartPoint = c, IsClosed = true };
+                figure.Segments.Add(new LineSegment(new Point(c.X, c.Y - r), true));
+                figure.Segments.Add(new ArcSegment(end, new System.Windows.Size(r, r), 0, parts[i] > 0.5, SweepDirection.Clockwise, true));
+                dc.DrawGeometry(fill, null, new PathGeometry([figure]));
+                dc.DrawEllipse(null, ink, c, r, r);
+                dc.DrawLine(ink, new Point(c.X - r, c.Y), new Point(c.X + r, c.Y));
+                dc.DrawLine(ink, new Point(c.X, c.Y - r), new Point(c.X, c.Y + r));
+                dc.DrawLine(ink, new Point(xs[i] - 55, 425), new Point(xs[i] + 40, 425));
+            }
+        }
+        var bitmap = new RenderTargetBitmap(w, h, 96, 96, PixelFormats.Pbgra32);
+        bitmap.Render(visual);
+        bitmap.Freeze();
+        return bitmap;
     }
 
     private void BlackScene(bool ar)

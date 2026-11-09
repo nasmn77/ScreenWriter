@@ -41,6 +41,7 @@ public partial class ToolbarWindow : Window
     public event Action?              LangToggleRequested;
     public event Action?              PositionToggleRequested;
     public event Action<BoardMode>?   BoardModeRequested;
+    public event Action<BoardCommand>? FileCommandRequested;
 
     // ── Slide animation ───────────────────────────────────────────────────────
     private const double TriggerHeight = 4;
@@ -65,6 +66,8 @@ public partial class ToolbarWindow : Window
     // Auto-hide works on the transparent screen only; a board keeps the toolbar shown.
     private bool     _autoHide = true;
     private DateTime _boardPopupClosedAt;
+    private DateTime _filePopupClosedAt;
+    private readonly DispatcherTimer _statusTimer = new() { Interval = TimeSpan.FromSeconds(2) };
 
     // ─────────────────────────────────────────────────────────────────────────
     public ToolbarWindow()
@@ -75,8 +78,15 @@ public partial class ToolbarWindow : Window
         {
             SyncMode(_currentModeIsDrawing);
             BoardMenu.FlowDirection = LocalizationService.Instance.FlowDirection;
+            FileMenu.FlowDirection  = LocalizationService.Instance.FlowDirection;
         };
         BoardMenu.FlowDirection = LocalizationService.Instance.FlowDirection;
+        FileMenu.FlowDirection  = LocalizationService.Instance.FlowDirection;
+
+        // The File button appears on boards: keep a right-aligned toolbar on the screen.
+        SizeChanged += (_, _) => ApplyPosition(SettingsService.Instance.ToolbarOnRight);
+
+        _statusTimer.Tick += (_, _) => { _statusTimer.Stop(); SyncMode(_currentModeIsDrawing); };
 
         // The toolbar, its menu and its tooltips are hidden from screen sharing.
         SourceInitialized += (_, _) => CaptureExclusion.Apply(new WindowInteropHelper(this).Handle);
@@ -163,6 +173,39 @@ public partial class ToolbarWindow : Window
             BoardModeRequested?.Invoke(mode);
     }
 
+    // ── File menu ─────────────────────────────────────────────────────────────
+    private void BtnFile_Click(object sender, RoutedEventArgs e)
+    {
+        if ((DateTime.Now - _filePopupClosedAt).TotalMilliseconds < 250) return;
+        FilePopup.IsOpen = !FilePopup.IsOpen;
+    }
+
+    private void FilePopup_Opened(object? sender, EventArgs e) => CaptureExclusion.Apply(FilePopup.Child);
+
+    private void FilePopup_Closed(object? sender, EventArgs e) => _filePopupClosedAt = DateTime.Now;
+
+    private void FileItem_Click(object sender, RoutedEventArgs e)
+    {
+        FilePopup.IsOpen = false;
+        if (sender is Button { Tag: string tag } && Enum.TryParse<BoardCommand>(tag, out var command))
+            FileCommandRequested?.Invoke(command);
+    }
+
+    public void CloseMenus()
+    {
+        BoardPopup.IsOpen = false;
+        FilePopup.IsOpen  = false;
+    }
+
+    /// <summary>Shows a short confirmation in place of the mode text.</summary>
+    public void FlashStatus(string text)
+    {
+        _statusTimer.Stop();
+        ModeText.Text       = text;
+        ModeText.Foreground = ActiveBrush;
+        _statusTimer.Start();
+    }
+
     // Tooltips open in their own popup windows; hide the toolbar's tooltips from capture too.
     static ToolbarWindow()
     {
@@ -205,6 +248,9 @@ public partial class ToolbarWindow : Window
                 buttons[i].BorderBrush = Brushes.White;
             }
         }
+
+        BtnFile.Visibility = mode == BoardMode.Transparent ? Visibility.Collapsed : Visibility.Visible;
+        if (mode == BoardMode.Transparent) FilePopup.IsOpen = false;
 
         _autoHide = mode == BoardMode.Transparent;
         if (_autoHide)

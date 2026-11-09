@@ -80,6 +80,29 @@
     <sys:String x:Key="Str_BoardTransparent">الشاشة (شفاف)</sys:String>
     <sys:String x:Key="Str_BoardWhite">سبورة بيضاء</sys:String>
     <sys:String x:Key="Str_BoardBlack">سبورة سوداء</sys:String>
-    <sys:String x:Key="Str_ExitBoardWarningMsg">رسومات السبورة ستُفقد عند الإغلاق. هل تريد الإغلاق؟</sys:String>
+
+    <!-- Board files and images -->
+    <sys:String x:Key="Str_File">ملف</sys:String>
+    <sys:String x:Key="Str_FileNew">جديد</sys:String>
+    <sys:String x:Key="Str_StoreUpdateMsg">يتوفر إصدار جديد من Screen Writer في المتجر. هل تريد فتح صفحة التحديث الآن؟</sys:String>
+    <sys:String x:Key="Str_FileSaveImage">حفظ كصورة…</sys:String>
+    <sys:String x:Key="Str_FileCopyImage">نسخ كصورة</sys:String>
+    <sys:String x:Key="Str_FileSave">حفظ</sys:String>
+    <sys:String x:Key="Str_FileSaveAs">حفظ باسم…</sys:String>
+    <sys:String x:Key="Str_FileOpen">فتح…</sys:String>
+    <sys:String x:Key="Str_FileInsertImage">إدراج صورة…</sys:String>
+    <sys:String x:Key="Str_Saved">تم الحفظ ✓</sys:String>
+    <sys:String x:Key="Str_Copied">تم النسخ ✓</sys:String>
+    <sys:String x:Key="Str_NoImageInClipboard">لا توجد صورة في الحافظة</sys:String>
+    <sys:String x:Key="Str_SaveChangesTitle">تغييرات غير محفوظة</sys:String>
+    <sys:String x:Key="Str_BoardUnsavedWhite">السبورة البيضاء فيها تغييرات غير محفوظة. هل تريد حفظها؟</sys:String>
+    <sys:String x:Key="Str_BoardUnsavedBlack">السبورة السوداء فيها تغييرات غير محفوظة. هل تريد حفظها؟</sys:String>
+    <sys:String x:Key="Str_FileInvalid">تعذّر فتح الملف. قد يكون تالفاً أو ليس ملف سبورة.</sys:String>
+    <sys:String x:Key="Str_FileNewer">هذا الملف محفوظ بإصدار أحدث من Screen Writer. حدّث التطبيق ثم أعد المحاولة.</sys:String>
+    <sys:String x:Key="Str_FileSaveFailed">تعذّر حفظ الملف. تأكد أن المجلد متاح للكتابة.</sys:String>
+    <sys:String x:Key="Str_ImageInvalid">تعذّر إدراج الصورة. الصيغ المدعومة: PNG وJPG وBMP وGIF، بحجم لا يتجاوز 50 ميجابايت.</sys:String>
+    <sys:String x:Key="Str_ClipboardBusy">الحافظة مشغولة ببرنامج آخر. حاول مرة أخرى.</sys:String>
+    <sys:String x:Key="Str_BoardFileType">ملف سبورة Screen Writer</sys:String>
+    <sys:String x:Key="Str_ImageFilter">الصور</sys:String>
 
 </ResourceDictionary>

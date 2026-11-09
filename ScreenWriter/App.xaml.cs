@@ -18,6 +18,12 @@ public partial class App : System.Windows.Application
     private ToolbarWindow? _toolbar;
     private TrayService? _tray;
     private HotkeyService? _hotkeys;
+    private BoardActions? _boardActions;
+    private SingleInstancePipe? _pipe;
+
+    // Board files received before the windows are ready
+    private readonly List<string> _pendingFiles = [];
+    private bool _ready;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -39,8 +45,17 @@ public partial class App : System.Windows.Application
 
         _mutex = new Mutex(true, MutexName, out bool createdNew);
         _ownsMutex = createdNew;
+
+        var startupFile = FindBoardFile(e.Args);
         if (!createdNew)
         {
+            // Double-clicked file while the app is running: hand it over and leave quietly.
+            if (startupFile is not null && SingleInstancePipe.Send(startupFile))
+            {
+                Shutdown();
+                return;
+            }
+
             LocalizationService.Instance.Load();
             var svc = LocalizationService.Instance;
             System.Windows.MessageBox.Show(
@@ -53,8 +68,20 @@ public partial class App : System.Windows.Application
         }
 
         LocalizationService.Instance.Load();
+        SettingsService.Instance.Load();
 
         base.OnStartup(e);
+
+        _pipe = new SingleInstancePipe();
+        _pipe.Listen(path => Dispatcher.BeginInvoke(() => OpenBoardFile(path)));
+
+        if (startupFile is not null)
+        {
+            // Opening a file should not wait for the splash screen.
+            _pendingFiles.Add(startupFile);
+            ShowMainWindows();
+            return;
+        }
 
         var splash = new SplashWindow();
         splash.Closed += (_, _) => ShowMainWindows();
@@ -122,6 +149,13 @@ public partial class App : System.Windows.Application
             // Pressing the shortcut of the current board returns to the screen.
             SetBoardMode(mode == _overlay.Mode ? BoardMode.Transparent : mode));
 
+        _boardActions = new BoardActions(_overlay, _toolbar, _hotkeys);
+        _hotkeys.CommandPressed       += _boardActions.Execute;
+        _toolbar.FileCommandRequested += _boardActions.Execute;
+        _overlay.FilesDropped         += _boardActions.HandleDrop;
+        _overlay.ToolSwitchRequested  += _toolbar.RestoreInitialTool;
+        _overlay.OwnedDialogClosed    += _toolbar.BringToTopmost;
+
         _overlay.Show();
         _toolbar.Show();
 
@@ -132,8 +166,17 @@ public partial class App : System.Windows.Application
             _overlay.SetColor(savedColor);
         }
         catch { }
+        _overlay.SetPenSize(SettingsService.Instance.LastPenSize);
         _toolbar.RestoreInitialPenSize(SettingsService.Instance.LastPenSize);
         _toolbar.RestoreInitialTool(SettingsService.Instance.LastTool);
+
+        // Files can only be shown once the overlay has loaded.
+        Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle, () =>
+        {
+            _ready = true;
+            foreach (var file in _pendingFiles) _boardActions.OpenPath(file);
+            _pendingFiles.Clear();
+        });
 
 #if DEBUG
         // Store-screenshot demo scenes (Debug builds only)
@@ -156,6 +199,25 @@ public partial class App : System.Windows.Application
                     Dispatcher.Invoke(() => UpdateDialog.Show(info));
             });
         }
+        else
+        {
+            CheckStoreUpdate();
+        }
+    }
+
+    private async void CheckStoreUpdate()
+    {
+        await Task.Delay(3000);
+        if (!await UpdateService.IsStoreUpdateAvailableAsync()) return;
+
+        // Never interrupt someone who is already drawing or teaching.
+        if (_overlay is null or { IsDrawingMode: true }) return;
+
+        var svc = LocalizationService.Instance;
+        Window? owner = _toolbar is { IsVisible: true } ? _toolbar : _overlay;
+        var result = MessageBox.Show(owner, svc.Get("Str_StoreUpdateMsg"), "Screen Writer",
+            MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes);
+        if (result == MessageBoxResult.Yes) UpdateService.Instance.OpenStoreListing();
     }
 
     private void SetBoardMode(BoardMode mode)
@@ -164,24 +226,44 @@ public partial class App : System.Windows.Application
         _overlay.SetBoardMode(mode);   // raises BoardModeChanged → syncs the toolbar
     }
 
+    private void OpenBoardFile(string path)
+    {
+        if (_ready) _boardActions?.OpenPath(path);
+        else        _pendingFiles.Add(path);
+    }
+
+    private static string? FindBoardFile(string[] args)
+    {
+        foreach (var arg in args)
+        {
+            if (!BoardFile.IsBoardFile(arg)) continue;
+            try { return System.IO.Path.GetFullPath(arg); }
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or System.IO.PathTooLongException) { }
+        }
+        return null;
+    }
+
     /// <summary>
-    /// Asks before exiting. Board drawings are not saved, so warn when a board has content;
+    /// Asks before exiting. Unsaved boards get a save prompt each;
     /// otherwise ask only when <paramref name="alwaysConfirm"/> is set (toolbar ✕ button).
     /// </summary>
     private void RequestExit(bool alwaysConfirm)
     {
-        var svc = LocalizationService.Instance;
-        string? msg = _overlay?.HasBoardContent == true ? svc.Get("Str_ExitBoardWarningMsg")
-                    : alwaysConfirm                    ? svc.Get("Str_CloseConfirmMsg")
-                    : null;
-        if (msg is not null)
+        if (_boardActions is { HasUnsavedBoards: true })
         {
+            if (_boardActions.ConfirmSaveAll()) Shutdown();
+            return;
+        }
+
+        if (alwaysConfirm)
+        {
+            var svc = LocalizationService.Instance;
             // Owned by a topmost window so the dialog shows above an opaque board.
             Window? owner = _toolbar is { IsVisible: true } ? _toolbar : _overlay;
             var result = owner is not null
-                ? MessageBox.Show(owner, msg, svc.Get("Str_CloseConfirmTitle"),
+                ? MessageBox.Show(owner, svc.Get("Str_CloseConfirmMsg"), svc.Get("Str_CloseConfirmTitle"),
                       MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No)
-                : MessageBox.Show(msg, svc.Get("Str_CloseConfirmTitle"),
+                : MessageBox.Show(svc.Get("Str_CloseConfirmMsg"), svc.Get("Str_CloseConfirmTitle"),
                       MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
             if (result != MessageBoxResult.Yes) return;
         }
@@ -190,6 +272,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _pipe?.Dispose();
         _hotkeys?.Dispose();
         _tray?.Dispose();
         SettingsService.Instance.Save();

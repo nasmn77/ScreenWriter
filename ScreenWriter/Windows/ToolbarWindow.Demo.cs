@@ -13,5 +13,7 @@ public partial class ToolbarWindow
     }
 
     internal void OpenBoardMenuForDemo() => BoardPopup.IsOpen = true;
+
+    internal void OpenFileMenuForDemo() => FilePopup.IsOpen = true;
 }
 #endif
