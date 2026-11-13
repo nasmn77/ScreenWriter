@@ -50,34 +50,10 @@ public partial class AboutWindow : Window
         Close(); // النافذة Topmost وقد تغطي نافذة المتجر
     }
 
-    private async void BtnCheckUpdates_Click(object sender, RoutedEventArgs e)
+    private void BtnCheckUpdates_Click(object sender, RoutedEventArgs e)
     {
-        if (UpdateService.IsPackagedApp)
-        {
-            UpdateService.Instance.OpenStoreListing();
-            return;
-        }
-
-        BtnCheckUpdates.IsEnabled = false;
-        TxtUpdateStatus.Text = LocalizationService.Instance.Get("Str_CheckingUpdates");
-
-        var info = await UpdateService.Instance.CheckAsync(CancellationToken.None);
-
-        BtnCheckUpdates.IsEnabled = true;
-
-        if (info != null)
-        {
-            TxtUpdateStatus.Text = "";
-            Close();
-            UpdateDialog.Show(info);
-        }
-        else if (UpdateService.Instance.LastCheckFailed)
-        {
-            TxtUpdateStatus.Text = LocalizationService.Instance.Get("Str_UpdateFailed");
-        }
-        else
-        {
-            TxtUpdateStatus.Text = LocalizationService.Instance.Get("Str_UpToDate");
-        }
+        // Updates come only from the Microsoft Store.
+        UpdateService.Instance.OpenStoreListing();
+        Close(); // النافذة Topmost وقد تغطي نافذة المتجر
     }
 }

@@ -7,7 +7,10 @@ namespace ScreenWriter.Services;
 /// <summary>Lets a second launch hand a file to the instance that is already running.</summary>
 public sealed class SingleInstancePipe : IDisposable
 {
-    private const string PipeName = "ScreenWriter_Open_A3F2B1C4";
+    // Pipe names are machine-wide; add the session id so each user's instance has its own pipe
+    // (matches the per-session Local\ mutex in App).
+    private static readonly string PipeName =
+        $"ScreenWriter_Open_A3F2B1C4_{System.Diagnostics.Process.GetCurrentProcess().SessionId}";
     private const int MaxPathChars = 32_768;
 
     private readonly CancellationTokenSource _cts = new();
@@ -50,7 +53,10 @@ public sealed class SingleInstancePipe : IDisposable
                     onPath(new string(buffer, 0, length));
             }
             catch (OperationCanceledException) { return; }
-            catch (IOException) { await Task.Delay(200, CancellationToken.None); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                await Task.Delay(200, CancellationToken.None);
+            }
         }
     }
 

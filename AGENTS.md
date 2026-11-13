@@ -24,7 +24,7 @@ dotnet publish ScreenWriter/ScreenWriter.csproj -p:PublishProfile=FolderProfile 
 ## Layout
 ```
 ScreenWriter/                 WPF project (App.xaml.cs wires everything together)
-  Windows/                    Overlay (InkCanvas), Toolbar, About, UpdateDialog, Splash
+  Windows/                    Overlay (InkCanvas), Toolbar, About, Splash
   Services/                   Hotkey, Tray, Localization, Settings, Update
   Resources/Strings.{ar,en}.xaml   all UI strings
   Assets/                     icon.ico + toolbar PNG icons (each listed as <Resource> in the csproj)
@@ -90,10 +90,10 @@ The `msix/` folder exists only on the owner's machine. It holds the SDK tools, `
 
 ## Legacy / gotchas
 - **No installer anymore:** the GitHub Releases and tags were deleted on purpose (Nov 2026). Distribution
-  is Store-only. `installer/` and the GitHub-release check in `UpdateService.CheckAsync` remain from the
-  old installer build. In the Store build, `IsPackagedApp` is true and that check is skipped.
-- **Unpackaged runs:** a dev run (`dotnet run`) is not packaged, so "Check for updates" queries GitHub,
-  finds no release and shows "couldn't check". This is expected.
+  is Store-only. `installer/` remains from the old installer build. The GitHub update check and
+  `UpdateDialog` were removed in v2.2.1; "Check for updates" just opens the Store listing.
+- **Single instance is per session:** the mutex is `Local\` and the open-file pipe name includes the session
+  id, so each Windows user (fast user switching) can run their own copy. Don't make them global again.
 - **Store version first:** don't bring back GitHub Releases or an installer download link unless the
   owner asks.
 

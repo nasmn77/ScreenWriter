@@ -191,7 +191,6 @@ ScreenWriter/
 │   ├── OverlayWindow.xaml(.cs)     # النافذة الشفافة الرئيسية + InkCanvas
 │   ├── ToolbarWindow.xaml(.cs)     # شريط الأدوات العائم
 │   ├── AboutWindow.xaml(.cs)       # نافذة "عن البرنامج" (التحديثات + التقييم)
-│   ├── UpdateDialog.xaml(.cs)      # نافذة التحديث المتوفر
 │   └── SplashWindow.xaml(.cs)      # شاشة البداية
 └── Services/
     ├── HotkeyService.cs            # اختصارات لوحة المفاتيح العالمية (Win32)
@@ -223,6 +222,10 @@ ScreenWriter/
 ---
 
 ## سجل التغييرات
+
+### v2.2.1
+- إصلاح: صار بإمكان أكثر من مستخدم على الجهاز نفسه تشغيل التطبيق في الوقت نفسه (عند تبديل المستخدم)، وكان يظهر للمستخدم الثاني خطأ «Access denied»
+- زر «التحقق من التحديثات» يفتح صفحة التطبيق في المتجر مباشرة، وحُذف نظام التحديث القديم من GitHub
 
 ### v2.2.0
 - **حفظ السبورة كصورة** PNG، ونسخها كصورة إلى الحافظة
@@ -465,7 +468,6 @@ ScreenWriter/
 │   ├── OverlayWindow.xaml(.cs)     # Main transparent overlay + InkCanvas
 │   ├── ToolbarWindow.xaml(.cs)     # Floating toolbar
 │   ├── AboutWindow.xaml(.cs)       # About window (updates + rating)
-│   ├── UpdateDialog.xaml(.cs)      # Update-available dialog
 │   └── SplashWindow.xaml(.cs)      # Splash screen
 └── Services/
     ├── HotkeyService.cs            # Global hotkeys (Win32)
@@ -497,6 +499,10 @@ ScreenWriter/
 ---
 
 ## Changelog
+
+### v2.2.1
+- Fix: several users on the same PC can now run the app at the same time (fast user switching); the second user used to get an "Access denied" error
+- "Check for updates" now opens the Store page directly; the old GitHub update system was removed
 
 ### v2.2.0
 - **Save a board as a PNG image**, or copy it to the clipboard as an image

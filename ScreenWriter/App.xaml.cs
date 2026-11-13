@@ -10,7 +10,8 @@ namespace ScreenWriter;
 
 public partial class App : System.Windows.Application
 {
-    private const string MutexName = "Global\\ScreenWriter_SingleInstance_A3F2B1C4";
+    // Local\ = one instance per Windows session, so each user (fast user switching) can run their own copy.
+    private const string MutexName = "Local\\ScreenWriter_SingleInstance_A3F2B1C4";
     private static Mutex? _mutex;
     private static bool _ownsMutex;
 
@@ -189,20 +190,7 @@ public partial class App : System.Windows.Application
             return;   // no update check in demo runs
         }
 #endif
-        if (!UpdateService.IsPackagedApp)
-        {
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(3000);
-                var info = await UpdateService.Instance.CheckAsync(CancellationToken.None);
-                if (info != null)
-                    Dispatcher.Invoke(() => UpdateDialog.Show(info));
-            });
-        }
-        else
-        {
-            CheckStoreUpdate();
-        }
+        CheckStoreUpdate();   // no-op outside the Store package
     }
 
     private async void CheckStoreUpdate()

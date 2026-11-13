@@ -149,15 +149,10 @@
                             Margin="8,0,0,0"/>
                 </StackPanel>
 
-                <TextBlock x:Name="TxtUpdateStatus"
-                           FontSize="11" Foreground="#9CA3AF"
-                           HorizontalAlignment="Center" Margin="0,8,0,0"
-                           TextAlignment="Center"/>
-
                 <!-- Copyright -->
                 <TextBlock Text="Copyright © 2026 Naser Almadi"
                            FontSize="11" Foreground="#374151"
-                           HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                           HorizontalAlignment="Center" Margin="0,14,0,0"/>
             </StackPanel>
         </Grid>
     </Border>
